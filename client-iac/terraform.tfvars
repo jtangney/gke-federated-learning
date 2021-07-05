@@ -1,0 +1,9 @@
+org_id = "934610919627"
+project_id = "tffe-client-5"
+billing_account = "01264F-35DC46-BB069C"
+region="us-east1"
+zones=["us-east1-b"]
+cluster_name_prefix="tffe"
+acm_repo_location="https://github.com/jtangney/anthos-federation"
+acm_branch="main"
+acm_dir="acm"
