@@ -1,0 +1,17 @@
+__pycache__/
+.Python
+build/
+.cache
+*.log
+target/
+venv/
+
+.terraform
+*.tfstate*
+.terraform.lock.hcl
+*.out
+
+tmp/
+install_asm*
+.DS_Store
+tff
