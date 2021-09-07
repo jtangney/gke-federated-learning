@@ -37,7 +37,7 @@ variable "client_cluster_node_count" {
 variable "client_cluster_machine_type" {
     description = "The machine type for a default node pool"
     type        = string
-    default     = "e2-standard-2"
+    default     = "e2-standard-4"
 }
 
 variable "acm_repo_location" {

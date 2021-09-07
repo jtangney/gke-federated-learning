@@ -2,11 +2,13 @@ module "gke" {
   source            = "terraform-google-modules/kubernetes-engine/google"
   project_id        = var.project_id
   name              = var.cluster_name_prefix
+  release_channel   = "REGULAR"
   regional          = false
   region            = var.region
   zones             = var.zones
   network           = google_compute_network.vpc.name
   subnetwork        = google_compute_subnetwork.subnet.name
+  network_policy    = true
   ip_range_pods     = ""
   ip_range_services = ""
   service_account   = "create"
