@@ -1,7 +1,7 @@
 module "project-services" {
   source  = "terraform-google-modules/project-factory/google//modules/project_services"
 
-  project_id  = google_project.project.project_id
+  project_id  = var.project_id
   disable_services_on_destroy = false
   activate_apis = [
     "cloudbilling.googleapis.com",
@@ -10,6 +10,7 @@ module "project-services" {
     "container.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "anthos.googleapis.com",
+    "anthosconfigmanagement.googleapis.com",
     "cloudtrace.googleapis.com",
     "meshca.googleapis.com",
     "meshtelemetry.googleapis.com",

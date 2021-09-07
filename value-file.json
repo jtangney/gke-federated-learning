@@ -1,0 +1,8 @@
+{
+"name": "projects/199520786861/settings/cloudrun-multiTenancy",
+"value": {
+  "stringSetValue": {
+    "values": [ "projects/jtg-db-client1" ]
+  }
+}
+}

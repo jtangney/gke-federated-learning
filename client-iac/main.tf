@@ -1,16 +1,27 @@
 terraform {
-  required_version = ">=0.14"
+  required_version = ">=1.0"
   required_providers {
-    google = "~> 3.5"
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 3.82.0, <4.0.0"
+    }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = ">= 3.82.0, <4.0.0"
+    }
   }
-
   backend "gcs" {
-    bucket = "tffe-terraform-state"
-    prefix = "federated-learning-tf-state-client"
+    bucket = "jtg-db-client1-tfstate"
+    // prefix = ""
   }
 }
 
 provider "google" {
+  project = var.project_id
+  region  = var.region
+}
+
+provider "google-beta" {
   project = var.project_id
   region  = var.region
 }

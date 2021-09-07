@@ -29,23 +29,25 @@ variable "cluster_name_prefix" {
 }
 
 variable "client_cluster_node_count" {
-    description = "The machine type for a default node pool"
+    description = "The number of nodes in the default node pool"
     type        = string
-    default     = 2
+    default     = 3
 }
 
 variable "client_cluster_machine_type" {
     description = "The machine type for a default node pool"
     type        = string
-    default     = "n1-standard-4"
+    default     = "e2-standard-2"
 }
 
 variable "acm_repo_location" {
   description = "The location of the git repo ACM will sync to"
 }
+
 variable "acm_branch" {
   description = "The git branch ACM will sync to"
 }
+
 variable "acm_dir" {
   description = "The directory in git ACM will sync to"
 }
