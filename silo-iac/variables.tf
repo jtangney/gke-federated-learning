@@ -61,3 +61,8 @@ variable "acm_create_ssh_key" {
     description = "Controls whether a key will be generated for Git authentication"
     default     = false
 }
+
+variable "asm_version" {
+    description = "ASM version"
+    default     = "1.10"
+}
