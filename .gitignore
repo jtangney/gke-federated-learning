@@ -12,5 +12,6 @@ terraform.tfstate.backup
 .terraform.lock.hcl
 
 tmp/
+install_asm*
 .DS_Store
 tff

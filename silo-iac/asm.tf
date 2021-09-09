@@ -7,6 +7,7 @@ module "asm" {
   location              = module.gke.location
   cluster_endpoint      = module.gke.endpoint
   enable_all            = false
+  enable_namespace_creation = true
   enable_cluster_roles  = true
   enable_cluster_labels = false
   enable_gcp_apis       = false
@@ -19,5 +20,5 @@ module "asm" {
   // options               = ["egressgateways"]
   // custom_overlays       = ["./custom_ingress_gateway.yaml"]
   skip_validation       = true
-  outdir                = "./${module.gke.name}-outdir-${var.asm_version}"
+  outdir                = "./install_asm_${var.asm_version}_${module.gke.name}_outdir"
 }

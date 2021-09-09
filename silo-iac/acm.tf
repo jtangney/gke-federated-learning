@@ -17,7 +17,6 @@ resource "google_gke_hub_feature" "feature" {
 resource "google_gke_hub_feature_membership" "feature_member" {
   location = "global"
   feature = google_gke_hub_feature.feature.name
-  // feature = "configmanagement"
   membership = google_gke_hub_membership.membership.membership_id
   configmanagement {
     version = "1.8.0"
@@ -36,4 +35,8 @@ resource "google_gke_hub_feature_membership" "feature_member" {
     }
   }
   provider = google-beta
+
+  depends_on = [
+    module.asm.asm_wait
+  ]
 }
