@@ -23,7 +23,7 @@ variable "zones" {
     type        = list
 }
 
-variable "cluster_name_prefix" {
+variable "cluster_name" {
     description = "The prefix of the Kubernetes cluster name"
     type        = string
 }
@@ -65,4 +65,14 @@ variable "acm_create_ssh_key" {
 variable "asm_version" {
     description = "ASM version"
     default     = "1.10"
+}
+
+variable "fl_node_pool_name" {
+    description = "Name of the GKE node pool dedicated to federated learning"
+    default = "flpool"
+}
+
+variable "master_ipv4_cidr_block" {
+  description = "The IP range in CIDR notation to use for the hosted master network"
+  default = "10.0.0.0/28"
 }
