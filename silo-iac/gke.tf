@@ -12,13 +12,14 @@ module "gke" {
   network_policy    = true
   ip_range_pods     = ""
   ip_range_services = ""
+  create_service_account = false
+  service_account   = google_service_account.cluster_default_sa.email
   enable_shielded_nodes = true
   identity_namespace = "enabled"
   master_ipv4_cidr_block = var.master_ipv4_cidr_block
   
-  // private cluster nodes
+  // Private cluster nodes, public endpoint with authorized networks
   enable_private_nodes = true
-  // public master, but with authorized networks below
   enable_private_endpoint  = false
   master_authorized_networks = [
     {
@@ -33,40 +34,39 @@ module "gke" {
   // open port for ASM
   add_master_webhook_firewall_rules = true
   
-  sandbox_enabled = true
-
-  create_service_account = false
-  remove_default_node_pool = true
-  
+  remove_default_node_pool = true  
   node_pools = [
     // replacement for default pool
     {
       name = "main-pool"
       image_type = "COS_CONTAINERD"
       machine_type = var.client_cluster_machine_type
-      service_account = google_service_account.cluster_default_sa.email
-      auto_upgrade = true
-      autoscaling  = true
       min_count  = var.client_cluster_node_count
-      max_count = 10
-      
+      max_count = 10      
+      auto_upgrade = true
       enable_integrity_monitoring = true
       enable_secure_boot = false
-    },
-    // new node pool dedicated to Federated Learning
-    # {
-    #   name = var.fl_node_pool_name
-    #   image_type = "COS_CONTAINERD"
-    #   machine_type = var.client_cluster_machine_type
-    #   service_account = google_service_account.cluster_flpool_sa.email
-    #   auto_upgrade = true
-    #   autoscaling  = true
-    #   min_count  = 2
-    #   max_count = 10
+      # sandbox_type = ""
       
-    #   enable_integrity_monitoring = true
-    #   enable_secure_boot = false
-    # },
+      # If the service account resource is reference directly, we get an error. 
+      # So just construct the email address as a workaround
+      service_account = format("%s@%s.iam.gserviceaccount.com", local.cluster_default_sa_name, var.project_id)
+    },
+    {
+      name = var.fl_node_pool_name
+      image_type = "COS_CONTAINERD"
+      machine_type = var.client_cluster_machine_type
+      min_count  = 2
+      max_count = 10      
+      auto_upgrade = true
+      enable_integrity_monitoring = true
+      enable_secure_boot = false
+      # sandbox_type = "gvisor"
+
+      # If the service account resource is reference directly, we get an error. 
+      # So just construct the email address as a workaround
+      service_account = format("%s@%s.iam.gserviceaccount.com", local.fl_node_pool_sa_name, var.project_id)
+    }
   ]
   
   node_pools_tags = {
@@ -98,6 +98,7 @@ module "gke" {
   }
 
   depends_on = [
-    module.project-services
+    module.project-services,
+    google_service_account.cluster_flpool_sa
   ]
 }

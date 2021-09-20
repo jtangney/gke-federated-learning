@@ -1,82 +1,57 @@
-# Anthos for federation setup blueprint
+# [WIP] Anthos for federation setup blueprint
 
-This repository contains blueprints to construct the infrastructure for federation
-using Anthos. The accompanying blueprint document covers how this architecture
-can be used for the purposes of enterprise federated learning. Refer to the assets
-in each folder of this repository for more details.
+This repository contains a blueprint that creates Google Cloud infrastructure that is ready to participate in 
+federated computations such as [federated learning](https://en.wikipedia.org/wiki/Federated_learning). 
 
-* [Governance and policy management](acm)
-* [Setting up the federation server side architecture](server-iac)
-* [Setting up the federation client side architecture](client-iac)
+Specifically, the blueprint creates and configures a Google Kubernetes Engine (GKE) cluster and related infrastructure
+such that the cluster is ready to participate as a processing node ("silo") in federated computation. The federated
+computation may involve running untrusted third party code or models, so the cluster is configured according to security
+best practices, and the workers performing federated computation are isolated. The blueprint uses [Anthos](https://cloud.google.com/anthos)
+features to automate and optimise the configuration and security of the cluster.
 
-## Requirements
-
-Below is a list of requirements that will need to be satisfied before beginning the installation.
-
-- This setup assumes the user is a member of the Organization Admin role.
-- While this setup can be extended to Anthos Kubernetes clusters running on premises or on other public clouds, currently the setup assumes Google managed Google Kubernetes Engine (GKE) clusters.
-- A billing account with sufficient quota is required.
-- Terraform, bash, gcloud and kubectl are required. For gcloud, the CLI user needs to be authenticated. Terraform version should be >= 0.14
-- In order to configure Anthos Config Management, a hosted git repository (on Github) dedicated for this purpose is required.
+## Requirements / Caveats
+- A Google Cloud project, with billing enabled and with sufficient quota is required.
+- You need Owner permissions on the project
+- The initial version of the blueprint creates infrastructure in Google Cloud. It can be extended to Anthos clusters running on premises or on other public clouds
+- You can deploy the blueprint using Cloud Shell. If you want to execute locally you'll need Terraform, bash, gcloud and kubectl
+- You use Anthos Config Management to configure your cluster. It is recommended to create a new git repository (e.g. on Github) to host cluster configs.
+- You create the infastructure using Terraform. The blueprint uses a local [backend](https://www.terraform.io/docs/language/settings/backends/configuration.html). It is recommended to configure a remote backend for anything other than experimentation
 
 ## Understanding the repository structure
-
 This repository has the following folders.
 
-* [Governance and policy management](acm)
+* [silo-iac](silo-iac)
+  
+  This folder contains the Terraform code used to create the GKE "silo" cluster and associated infrastructure.
 
-  This folder contains the policies that govern the participating clusters, both
-  client and server clusters. The clusters that participate in federation use
-  Anthos Config Management for their management configuration. Since Anthos Config Management uses a git repository to retrieve and synchronize cluster configuration,
-  you will need to create a separate repository for this purpose using the files
-  in this folder.
-
-* [Setting up the federation server side architecture](server-iac)
-
-  This folder contains the Terraform code necessary to setup the server side
-  architecture.
-
-* [Setting up the federation client side architecture](client-iac)
-
-  This folder contains the Terraform code necessary to setup the client side
-  architecture.
-
-## Getting started
-
-- Identify or create a Google Cloud Admin project. This project is where the terraform state will be stored
-- Create a Google Cloud service account to run the terraform code for this setup.
-  Make sure to download the key and store it in a safe location. Setup your workstation,
-  to use these credentials to execute the terraform code.
-- Create (or choose) a Google Cloud storage bucket that the service account has read/write access to. This will be used as the backend for terraform state.
-- Review the `terraform.tfvars` file in the `client-iac` and `server-iac` folders
-  and replace variables appropriately
+* [acm](acm)
+  
+  This folder contains the configuration and policies that are applied to your GKE cluster by Anthos Config
+  Management (ACM). It is recommended to copy this directory to a new git repository that you own.
 
 
-## Setting up the server
+## Deploy the blueprint
+- Open Cloud Shell
 
-Edit the `terraform.tfvars` file in the `server-iac` folder to set the values for the following variables:
+- Clone this repo
 
-1. project_id: Your Google cloud project ID that will serve as the admin project
-2. region: Region where you would like the cluster and other resources to be created in
-3. zones: Select one or more zones in the region
-4. server_cluster_node_count: Number of nodes the cluster should be created with
-5. acm_repo_location: Make sure to point this to the git repository that you
-   create for Anthos Config Management
-6. acm_branch: The branch of the repository to sync from, defaulted to 'main'
+- Change into the IaC dir  
+  ```cd silo-iac```
 
-```
-cd iac-server
-terraform init
-terraform plan -out terraform.out
-terraform apply terraform.out --auto-approve
-```
-## Onboarding a client
+- Review the `terraform.tfvars` file and replace values appropriately
 
-Clients will be onboarded independent of other clients and therefore the
-`client-iac` folder should be hosted as an indepedent repository making it easier
-to distribute the necessary terraform code needed to onboard a new client.
+- Set a Terraform environment variable for your project ID  
+  ```export TF_VAR_project_id=[YOUR_PROJECT_ID]```
 
-Edit the `terraform.tfvars` file in the `client-iac` folder (to be hosted as a separate repository upon go live) to set the values for the following variables:
+- Initialise Terraform  
+  ```terraform init```
 
-Rest of the README is TO-DO
+- Create the plan; review it so you know what's going on  
+  ```terraform plan -out terraform.out```
 
+- Apply the plan to create the cluster. Note this may take ~12 minutes to complete  
+  ```terraform apply terraform.out```
+
+
+##  Test
+TCB

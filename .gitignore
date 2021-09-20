@@ -7,8 +7,9 @@ target/
 venv/
 
 .terraform
-*.tfstate
+*.tfstate*
 .terraform.lock.hcl
+*.out
 
 tmp/
 install_asm*

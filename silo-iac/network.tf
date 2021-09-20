@@ -15,19 +15,6 @@ resource "google_compute_subnetwork" "subnet" {
   network       = google_compute_network.vpc.id
 }
 
-# module "nat" {
-#   source  = "terraform-google-modules/cloud-router/google"
-#   version = "~> 0.4"
-#   project = var.project_id
-#   name    = "fl-cloud-router"
-#   network = google_compute_network.vpc.name
-#   region  = google_compute_subnetwork.subnet.region
-
-#   nats = [{
-#     name = "fl-nat-gateway"
-#   }]
-# }
-
 resource "google_compute_router" "router" {
   name    = "my-router"
   region  = google_compute_subnetwork.subnet.region

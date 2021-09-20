@@ -1,15 +1,5 @@
-variable "org_id" {
-    description = "The GCP org project ID"
-    type        = string
-}
-
 variable "project_id" {
     description = "The GCP project ID"
-    type        = string
-}
-
-variable "billing_account" {
-    description = "The GCP Billing account"
     type        = string
 }
 
@@ -76,3 +66,9 @@ variable "master_ipv4_cidr_block" {
   description = "The IP range in CIDR notation to use for the hosted master network"
   default = "10.0.0.0/28"
 }
+
+locals {
+  fl_node_pool_sa_name = format("gke-%s-%s-sa", var.cluster_name, var.fl_node_pool_name)
+  cluster_default_sa_name = format("gke-%s-default-sa", var.cluster_name)
+}
+
