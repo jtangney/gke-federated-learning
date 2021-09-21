@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: nginx
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -17,6 +17,22 @@ spec:
         image: nginx:1.16.1
         ports:
         - containerPort: 80
+      # only schedule pods on fl-pool nodes
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: "fl-pool"
+                operator: Equals
+                values:
+                - "true"
+      # also tolerate the fl-pool taint
+      tolerations:
+      - key: "fl-pool"
+        operator: "Equals"
+        value: "true"
+        effect: "NoExecute"
 
 ---
 apiVersion: v1
