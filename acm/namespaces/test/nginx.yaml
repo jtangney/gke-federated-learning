@@ -24,7 +24,7 @@ spec:
             nodeSelectorTerms:
             - matchExpressions:
               - key: "fl-pool"
-                operator: Equal
+                operator: In
                 values:
                 - "true"
       # also tolerate the fl-pool taint
