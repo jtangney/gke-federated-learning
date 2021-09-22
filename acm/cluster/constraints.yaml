@@ -1,20 +1,20 @@
-apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sRequiredLabels
-metadata:
-  name: all-must-have-testing
-spec:
-  match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
-    namespaces: ["test"]
-  parameters:
-    message: "All pods must have an `tesing` label"
-    labels:
-      - key: testing
-        allowedRegex: "true"
+# apiVersion: constraints.gatekeeper.sh/v1beta1
+# kind: K8sRequiredLabels
+# metadata:
+#   name: all-must-have-testing
+# spec:
+#   match:
+#     kinds:
+#       - apiGroups: [""]
+#         kinds: ["Pod"]
+#     namespaces: ["test"]
+#   parameters:
+#     message: "All pods must have an `tesing` label"
+#     labels:
+#       - key: testing
+#         allowedRegex: "true"
 
----
+# ---
 apiVersion: mutations.gatekeeper.sh/v1alpha1
 kind: Assign
 metadata:
@@ -36,3 +36,24 @@ spec:
             operator: In
             values:
             - "true"
+
+---
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: mutator-add-toleration
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  match:
+    namespaces: ["test"]
+  location: "tolerations"
+  parameters:
+    assign:
+      value: 
+      - key: "fl-pool"
+        operator: "Equal"
+        value: "true"
+        effect: "NoExecute"
