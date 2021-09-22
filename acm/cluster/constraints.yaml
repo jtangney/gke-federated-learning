@@ -13,3 +13,26 @@ spec:
     labels:
       - key: testing
         allowedRegex: "true"
+
+---
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: mutator-add-nodeaffinity
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  match:
+    namespaces: ["test"]
+  location: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution"
+  parameters:
+    assign:
+      value: 
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "fl-pool"
+            operator: In
+            values:
+            - "true"
