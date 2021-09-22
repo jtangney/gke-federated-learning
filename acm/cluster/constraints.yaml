@@ -49,7 +49,7 @@ spec:
     versions: ["v1"]
   match:
     namespaces: ["test"]
-  location: "tolerations"
+  location: "spec.tolerations"
   parameters:
     assign:
       value: 
