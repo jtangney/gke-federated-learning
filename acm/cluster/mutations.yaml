@@ -1,20 +1,7 @@
-# apiVersion: constraints.gatekeeper.sh/v1beta1
-# kind: K8sRequiredLabels
-# metadata:
-#   name: all-must-have-testing
-# spec:
-#   match:
-#     kinds:
-#       - apiGroups: [""]
-#         kinds: ["Pod"]
-#     namespaces: ["test"]
-#   parameters:
-#     message: "All pods must have an `tesing` label"
-#     labels:
-#       - key: testing
-#         allowedRegex: "true"
+# PolicyController mutations.
+# https://cloud.google.com/anthos-config-management/docs/how-to/mutation#writing_mutators
 
-# ---
+# Adds a node affinity to all pods in a specific namespace
 apiVersion: mutations.gatekeeper.sh/v1alpha1
 kind: Assign
 metadata:
@@ -26,11 +13,10 @@ spec:
     versions: ["v1"]
   match:
     namespaces: ["test"]
-  location: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution"
+  location: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms"
   parameters:
     assign:
       value: 
-        nodeSelectorTerms:
         - matchExpressions:
           - key: "fl-pool"
             operator: In
@@ -38,6 +24,7 @@ spec:
             - "true"
 
 ---
+# Adds a toleration to all pods in a specific namespace
 apiVersion: mutations.gatekeeper.sh/v1alpha1
 kind: Assign
 metadata:
