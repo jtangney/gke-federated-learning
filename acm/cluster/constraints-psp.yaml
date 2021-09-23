@@ -14,13 +14,13 @@ spec:
         kinds: ["Pod"]
     excludedNamespaces: ["kube-system"]
 
----
-apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sPSPReadOnlyRootFilesystem
-metadata:
-  name: psp-readonlyrootfilesystem
-spec:
-  match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
+# ---
+# apiVersion: constraints.gatekeeper.sh/v1beta1
+# kind: K8sPSPReadOnlyRootFilesystem
+# metadata:
+#   name: psp-readonlyrootfilesystem
+# spec:
+#   match:
+#     kinds:
+#       - apiGroups: [""]
+#         kinds: ["Pod"]
