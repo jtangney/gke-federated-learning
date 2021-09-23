@@ -1,0 +1,26 @@
+# Adds selected PodSecurityPolicy constraints 
+# https://cloud.google.com/anthos-config-management/docs/how-to/using-constraints-to-enforce-pod-security
+
+# prevent privileged containers
+# Note that you need to use the Istio cni-plugin (or else exclude istio-system from the policy)
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPPrivilegedContainer
+metadata:
+  name: psp-privileged-container
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    excludedNamespaces: ["kube-system"]
+
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPReadOnlyRootFilesystem
+metadata:
+  name: psp-readonlyrootfilesystem
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
