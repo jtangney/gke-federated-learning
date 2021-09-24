@@ -1,7 +1,0 @@
-namespace: tenant1-ns
-namePrefix: tenant1-
-bases:
-  - ../../../bases
-
-commonLabels:
-  tenant: tenant1
