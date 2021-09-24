@@ -1,5 +1,5 @@
 module "gke" {
-  // source            = "terraform-google-modules/kubernetes-engine/google"
+  // update to safer-cluster?
   source            = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
   project_id        = var.project_id
   name              = var.cluster_name
@@ -12,12 +12,15 @@ module "gke" {
   network_policy    = true
   ip_range_pods     = ""
   ip_range_services = ""
-  create_service_account = false
-  service_account   = google_service_account.cluster_default_sa.email
   enable_shielded_nodes = true
   identity_namespace = "enabled"
   master_ipv4_cidr_block = var.master_ipv4_cidr_block
-  
+
+  // Create a new service account (SA) with default IAM permissions as default cluster SA
+  // Create separate service account for the non default node pool(s)
+  create_service_account = true
+  grant_registry_access = true
+
   // Private cluster nodes, public endpoint with authorized networks
   enable_private_nodes = true
   enable_private_endpoint  = false
@@ -47,10 +50,6 @@ module "gke" {
       enable_integrity_monitoring = true
       enable_secure_boot = false
       # sandbox_type = ""
-      
-      # If the service account resource is reference directly, we get an error. 
-      # So just construct the email address as a workaround
-      service_account = format("%s@%s.iam.gserviceaccount.com", local.cluster_default_sa_name, var.project_id)
     },
     {
       name = var.fl_node_pool_name
@@ -63,6 +62,7 @@ module "gke" {
       enable_secure_boot = false
       # sandbox_type = "gvisor"
 
+      # Dedicated service account for the FL pool
       # If the service account resource is reference directly, we get an error. 
       # So just construct the email address as a workaround
       service_account = format("%s@%s.iam.gserviceaccount.com", local.fl_node_pool_sa_name, var.project_id)
