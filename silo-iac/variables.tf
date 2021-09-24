@@ -30,6 +30,11 @@ variable "client_cluster_machine_type" {
     default     = "e2-standard-4"
 }
 
+variable "acm_version" {
+  description = "The location of the git repo ACM will sync to"
+  default = "1.9.0"
+}
+
 variable "acm_repo_location" {
   description = "The location of the git repo ACM will sync to"
 }
