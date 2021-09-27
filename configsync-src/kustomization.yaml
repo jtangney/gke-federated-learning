@@ -1,4 +1,3 @@
 resources:
-    # - mutations.yaml
     - constraints-psp.yaml
     - fedlearn/
