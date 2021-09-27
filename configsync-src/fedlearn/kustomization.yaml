@@ -15,7 +15,6 @@
 # accidentally sending traffic to Services in other namespaces.
 # [START anthos_config_management_namespace_specific_policy_src_tenant_a_kustomization] 
 
-namespace: fedlearn
 namePrefix: fedlearn-
 
 resources:
@@ -29,23 +28,22 @@ patches:
 #     - op: replace
 #       path: /subjects/0/name
 #       value: tenant-a-admin@mydomain.com
-# - target:
-#     kind: Namespace
-#     name: default
-#   patch: |-
-#     - op: replace
-#       path: /metadata/name
-#       value: fedlearn
-# remove namespace from the mutations; these are cluster-level resources
 - target:
-    kind: Assign
+    kind: .*
   patch: |-
-    - op: remove
+    - op: replace
       path: /metadata/namespace
+      value: fedlearn
+# remove namespace from the mutations; these are cluster-level resources
+# - target:
+#     kind: Assign
+#   patch: |-
+#     - op: remove
+#       path: /metadata/namespace
 # update the affected namespace
 - target:
     kind: Assign
   patch: |-
     - op: replace
-      path: /spec/match/namespace
-      value: fedlearn
+      path: /spec/match/namespaces
+      value: [fedlearn]
