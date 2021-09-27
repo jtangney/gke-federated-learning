@@ -3,7 +3,7 @@ module "gke" {
   source            = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
   project_id        = var.project_id
   name              = var.cluster_name
-  release_channel   = "REGULAR"
+  release_channel   = "RAPID"
   regional          = false
   region            = var.region
   zones             = var.zones
