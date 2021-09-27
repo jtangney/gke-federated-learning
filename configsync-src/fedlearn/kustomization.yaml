@@ -14,6 +14,7 @@
 # deny all ingress traffic to avoid Pods from one namespace
 # accidentally sending traffic to Services in other namespaces.
 # [START anthos_config_management_namespace_specific_policy_src_tenant_a_kustomization] 
+
 namespace: fedlearn
 namePrefix: fedlearn-
 
@@ -35,17 +36,16 @@ patches:
 #     - op: replace
 #       path: /metadata/name
 #       value: fedlearn
+# remove namespace from the mutations; these are cluster-level resources
 - target:
     kind: Assign
-    # name: default
+  patch: |-
+    - op: remove
+      path: /metadata/namespace
+# update the affected namespace
+- target:
+    kind: Assign
   patch: |-
     - op: replace
       path: /spec/match/namespace
       value: fedlearn
-# - target:
-#     kind: Assign
-#     name: mutator-add-nodeaffinity
-#   patch: |-
-#     - op: replace
-#       path: /spec/match/namespace
-#       value: fl-pool
