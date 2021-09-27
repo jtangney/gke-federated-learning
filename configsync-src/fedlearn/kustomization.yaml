@@ -20,7 +20,7 @@ namePrefix: fedlearn-
 resources:
 - ../base
 
-# patches:
+patches:
 # - target:
 #     kind: RoleBinding
 #     name: tenant-admin-rolebinding
@@ -35,3 +35,17 @@ resources:
 #     - op: replace
 #       path: /metadata/name
 #       value: fedlearn
+- target:
+    kind: Assign
+    # name: default
+  patch: |-
+    - op: replace
+      path: /spec/match/namespace
+      value: fedlearn
+# - target:
+#     kind: Assign
+#     name: mutator-add-nodeaffinity
+#   patch: |-
+#     - op: replace
+#       path: /spec/match/namespace
+#       value: fl-pool

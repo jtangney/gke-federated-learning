@@ -12,13 +12,13 @@ spec:
     kinds: ["Pod"]
     versions: ["v1"]
   match:
-    namespaces: ["test"]
+    namespaces: ["ns"]
   location: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms"
   parameters:
     assign:
       value: 
         - matchExpressions:
-          - key: "fl-pool"
+          - key: "tenant-pool"
             operator: In
             values:
             - "true"
@@ -35,12 +35,12 @@ spec:
     kinds: ["Pod"]
     versions: ["v1"]
   match:
-    namespaces: ["test"]
+    namespaces: ["ns"]
   location: "spec.tolerations"
   parameters:
     assign:
       value: 
-      - key: "fl-pool"
+      - key: "tenant-pool"
         operator: "Equal"
         value: "true"
         effect: "NoExecute"
