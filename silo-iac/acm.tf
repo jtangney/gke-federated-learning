@@ -27,7 +27,8 @@ resource "google_gke_hub_feature_membership" "feature_member" {
         policy_dir = var.acm_dir
         secret_type = var.acm_secret_type
       }
-      source_format = "hierarchy"
+      # source_format = "hierarchy"
+      source_format = "unstructured"
     }
     policy_controller {
       enabled = true
