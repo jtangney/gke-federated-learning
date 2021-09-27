@@ -21,29 +21,33 @@ resources:
 - ../base
 
 patches:
-# - target:
-#     kind: RoleBinding
-#     name: tenant-admin-rolebinding
-#   patch: |-
-#     - op: replace
-#       path: /subjects/0/name
-#       value: tenant-a-admin@mydomain.com
+# add namespace to certain resources
 - target:
-    kind: .*
+    kind: ServiceAccount
   patch: |-
     - op: replace
       path: /metadata/namespace
       value: fedlearn
-# remove namespace from the mutations; these are cluster-level resources
-# - target:
-#     kind: Assign
-#   patch: |-
-#     - op: remove
-#       path: /metadata/namespace
-# update the affected namespace
+# update the namespace targeted by mutations
 - target:
     kind: Assign
   patch: |-
     - op: replace
       path: /spec/match/namespaces
       value: [fedlearn]
+# update the node-pool selector for the mutations
+- target:
+    kind: Assign
+    name: mutator-add-nodeaffinity
+  patch: |-
+    - op: add
+      path: /spec/parameters/assign/value/0/matchExpressions/0/key
+      value: fl-pool
+# update the node-pool selector for the mutations
+- target:
+    kind: Assign
+    name: mutator-add-toleration
+  patch: |-
+    - op: add
+      path: /spec/parameters/assign/value/0/key
+      value: fl-pool
