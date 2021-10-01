@@ -3,19 +3,19 @@ module "gke" {
   source            = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
   project_id        = var.project_id
   name              = var.cluster_name
-  release_channel   = "RAPID"
+  release_channel   = "STABLE"
   regional          = false
   region            = var.region
   zones             = var.zones
   network           = google_compute_network.vpc.name
   subnetwork        = google_compute_subnetwork.subnet.name
+  ip_range_pods     = "pods"
+  ip_range_services = "services"
+  master_ipv4_cidr_block = var.master_ipv4_cidr_block
   network_policy    = true
-  ip_range_pods     = ""
-  ip_range_services = ""
   enable_shielded_nodes = true
   identity_namespace = "enabled"
-  master_ipv4_cidr_block = var.master_ipv4_cidr_block
-
+ 
   // Create a new service account (SA) with default IAM permissions as default cluster SA
   // Create separate service account for the non default node pool(s)
   create_service_account = true
@@ -72,9 +72,6 @@ module "gke" {
   node_pools_tags = {
     all = [
       "${var.cluster_name}"
-    ]
-    main-pool = [
-      "default-node-pool",
     ]
   }
   
