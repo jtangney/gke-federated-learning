@@ -71,7 +71,6 @@ spec:
 kind: NetworkPolicy
 metadata:
   name: allow-egress-to-private-google-apis
-  namespace: team-x
 spec:
   podSelector: {}
   policyTypes:
