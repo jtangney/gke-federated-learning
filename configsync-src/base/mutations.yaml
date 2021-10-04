@@ -18,10 +18,10 @@ spec:
     assign:
       value: 
         - matchExpressions:
-          - key: "fl-pool"
+          - key: "tenant"
             operator: In
             values:
-            - "true"
+            - "tenantName"
 
 ---
 # Adds a toleration to all pods in a specific namespace
@@ -40,7 +40,7 @@ spec:
   parameters:
     assign:
       value: 
-      - key: "fl-pool"
+      - key: "tenant"
         operator: "Equal"
-        value: "true"
+        value: "tenantName"
         effect: "NoExecute"

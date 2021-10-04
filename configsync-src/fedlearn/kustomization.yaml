@@ -54,14 +54,14 @@ patches:
     kind: Assign
     name: mutator-add-nodeaffinity
   patch: |-
-    - op: add
-      path: /spec/parameters/assign/value/0/matchExpressions/0/key
-      value: fl-pool
+    - op: replace
+      path: /spec/parameters/assign/value/0/matchExpressions/0/values/0
+      value: fedlearn
 # update the node-pool selector for the mutations
 - target:
     kind: Assign
     name: mutator-add-toleration
   patch: |-
-    - op: add
-      path: /spec/parameters/assign/value/0/key
-      value: fl-pool
+    - op: replace
+      path: /spec/parameters/assign/value/0/value
+      value: fedlearn
