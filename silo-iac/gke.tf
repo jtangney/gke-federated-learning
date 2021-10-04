@@ -3,7 +3,7 @@ module "gke" {
   source            = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
   project_id        = var.project_id
   name              = var.cluster_name
-  release_channel   = "STABLE"
+  release_channel   = "RAPID"
   regional          = false
   region            = var.region
   zones             = var.zones
@@ -52,7 +52,7 @@ module "gke" {
       # sandbox_type = ""
     },
     {
-      name = var.fl_node_pool_name
+      name = local.tenant_nodepool_name
       image_type = "COS_CONTAINERD"
       machine_type = var.client_cluster_machine_type
       min_count  = 2
@@ -65,30 +65,28 @@ module "gke" {
       # Dedicated service account for the FL pool
       # If the service account resource is reference directly, we get an error. 
       # So just construct the email address as a workaround
-      service_account = format("%s@%s.iam.gserviceaccount.com", local.fl_node_pool_sa_name, var.project_id)
+      service_account = format("%s@%s.iam.gserviceaccount.com", local.tenant_nodepool_sa_name, var.project_id)
     }
   ]
   
   node_pools_tags = {
-    all = [
-      "${var.cluster_name}"
-    ]
+    all = []
   }
   
   node_pools_labels = {
     all = {}
-    "${var.fl_node_pool_name}" = {
-      "fl-pool" = true
+    "${local.tenant_nodepool_name}" = {
+      "tenant" = var.tenant_name
     }
   }
 
   node_pools_taints = {
     all = []
     // taint the FL pool - we use this pool exclusively for FL workloads 
-    "${var.fl_node_pool_name}" = [
+    "${local.tenant_nodepool_name}" = [
       {
-        key    = "fl-pool"
-        value  = true
+        key    = "tenant"
+        value  = var.tenant_name
         effect = "NO_EXECUTE"
       },
     ]
@@ -96,6 +94,6 @@ module "gke" {
 
   depends_on = [
     module.project-services,
-    google_service_account.cluster_flpool_sa
+    google_service_account.tenant_nodepool_sa
   ]
 }

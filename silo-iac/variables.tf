@@ -62,9 +62,9 @@ variable "asm_version" {
     default     = "1.10"
 }
 
-variable "fl_node_pool_name" {
+variable "tenant_name" {
     description = "Name of the GKE node pool dedicated to federated learning"
-    default = "flpool"
+    default = "fedlearn"
 }
 
 variable "master_ipv4_cidr_block" {
@@ -73,7 +73,8 @@ variable "master_ipv4_cidr_block" {
 }
 
 locals {
-  fl_node_pool_sa_name = format("gke-%s-%s-sa", var.cluster_name, var.fl_node_pool_name)
+  tenant_nodepool_name = format("%s-pool", var.tenant_name)
+  tenant_nodepool_sa_name = format("gke-%s-%s-sa", var.cluster_name, var.tenant_name)
   cluster_default_sa_name = format("gke-%s-default-sa", var.cluster_name)
 }
 
