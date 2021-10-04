@@ -15,13 +15,24 @@
 # accidentally sending traffic to Services in other namespaces.
 # [START anthos_config_management_namespace_specific_policy_src_tenant_a_kustomization] 
 
-namespace: fedlearn
-namePrefix: fedlearn-
-
 resources:
 - ../base
 
 patches:
+# set namespace name
+- target:
+    kind: Namespace
+  patch: |-
+    - op: replace
+      path: /metadata/name
+      value: fedlearn
+# add namespace to labelled resources
+- target:
+    labelSelector: "kustomizeNamespaced=true"
+  patch: |-
+    - op: replace
+      path: /metadata/namespace
+      value: fedlearn
 # add Workload Identity annotation
 - target:
     kind: ServiceAccount
@@ -30,33 +41,27 @@ patches:
     - op: replace
       path: /metadata/annotations/iam.gke.io~1gcp-service-account
       value: fl-apps-sa@jtg-db-client1.iam.gserviceaccount.com
-# # add namespace to certain resources
-# - target:
-#     kind: ServiceAccount
-#   patch: |-
-#     - op: replace
-#       path: /metadata/namespace
-#       value: fedlearn
-# # update the namespace targeted by mutations
-# - target:
-#     kind: Assign
-#   patch: |-
-#     - op: replace
-#       path: /spec/match/namespaces
-#       value: [fedlearn]
-# # update the node-pool selector for the mutations
-# - target:
-#     kind: Assign
-#     name: mutator-add-nodeaffinity
-#   patch: |-
-#     - op: add
-#       path: /spec/parameters/assign/value/0/matchExpressions/0/key
-#       value: fl-pool
-# # update the node-pool selector for the mutations
-# - target:
-#     kind: Assign
-#     name: mutator-add-toleration
-#   patch: |-
-#     - op: add
-#       path: /spec/parameters/assign/value/0/key
-#       value: fl-pool
+
+# update the namespace targeted by mutations
+- target:
+    kind: Assign
+  patch: |-
+    - op: replace
+      path: /spec/match/namespaces
+      value: [fedlearn]
+# update the node-pool selector for the mutations
+- target:
+    kind: Assign
+    name: mutator-add-nodeaffinity
+  patch: |-
+    - op: add
+      path: /spec/parameters/assign/value/0/matchExpressions/0/key
+      value: fl-pool
+# update the node-pool selector for the mutations
+- target:
+    kind: Assign
+    name: mutator-add-toleration
+  patch: |-
+    - op: add
+      path: /spec/parameters/assign/value/0/key
+      value: fl-pool

@@ -12,7 +12,7 @@ spec:
     kinds: ["Pod"]
     versions: ["v1"]
   match:
-    namespaces: ["fedlearn"]
+    namespaces: ["ns"]
   location: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms"
   parameters:
     assign:
@@ -35,7 +35,7 @@ spec:
     kinds: ["Pod"]
     versions: ["v1"]
   match:
-    namespaces: ["fedlearn"]
+    namespaces: ["ns"]
   location: "spec.tolerations"
   parameters:
     assign:

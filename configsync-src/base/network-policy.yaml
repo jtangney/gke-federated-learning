@@ -16,6 +16,8 @@
 # apiVersion: networking.k8s.io/v1
 # metadata:
 #   name: default-deny-all-ingress
+#   labels:
+#     kustomizeNamespaced: true
 # spec:
 #   podSelector: {}
 #   policyTypes:
@@ -26,6 +28,8 @@
 # apiVersion: networking.k8s.io/v1
 # metadata:
 #   name: default-deny-all
+#   labels:
+#     kustomizeNamespaced: "true"
 # spec:
 #   podSelector: {}
 #   policyTypes:
@@ -37,6 +41,8 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
   name: allow-egress-istio-system
+  labels:
+    kustomizeNamespaced: "true"
 spec:
   podSelector: {}
   policyTypes:
@@ -52,6 +58,8 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
   name: allow-egress-kube-system-dns
+  labels:
+    kustomizeNamespaced: "true"
 spec:
   podSelector: {}
   policyTypes:
@@ -72,6 +80,8 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
   name: allow-egress-to-private-google-apis
+  labels:
+    kustomizeNamespaced: "true"
 spec:
   podSelector: {}
   policyTypes:
@@ -86,6 +96,8 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
   name: allow-egress-to-metadata-server
+  labels:
+    kustomizeNamespaced: "true"
 spec:
   podSelector: {}
   policyTypes:
