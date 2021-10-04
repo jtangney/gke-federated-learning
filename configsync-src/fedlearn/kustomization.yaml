@@ -21,7 +21,15 @@ namePrefix: fedlearn-
 resources:
 - ../base
 
-# patches:
+patches:
+# add Workload Identity annotation
+- target:
+    kind: ServiceAccount
+    name: ksa
+  patch: |-
+    - op: add
+      path: /metadata/annotations
+      value: iam.gke.io/gcp-service-account=fl-apps-sa@jtg-db-client1.iam.gserviceaccount.com
 # # add namespace to certain resources
 # - target:
 #     kind: ServiceAccount
