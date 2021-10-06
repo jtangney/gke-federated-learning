@@ -40,7 +40,7 @@ patches:
   patch: |-
     - op: replace
       path: /metadata/annotations/iam.gke.io~1gcp-service-account
-      value: fl-apps-sa@jtg-db-client1.iam.gserviceaccount.com
+      value: flsilo-fedlearn-apps-sa@jtg-db-client1.iam.gserviceaccount.com
 
 # update the namespace targeted by mutations
 - target:
