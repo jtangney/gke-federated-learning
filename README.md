@@ -24,7 +24,7 @@ This repository has the following folders.
   
   This folder contains the Terraform code used to create the GKE "silo" cluster and associated infrastructure.
 
-* [acm](acm)
+* [configsync](configsync)
   
   This folder contains the configuration and policies that are applied to your GKE cluster by Anthos Config
   Management (ACM). It is recommended to copy this directory to a new git repository that you own.
