@@ -2,8 +2,10 @@
 
 # fetch the current ConfigSync configuration
 CONFIGSYNC_SPEC=$(gcloud alpha container hub config-management fetch-for-apply --membership $1)
-# update the value of mutations flag
-UPDATED_SPEC=$(echo "${CONFIGSYNC_SPEC//mutationEnabled: false/mutationEnabled: true}")
+# write a local temp file, setting the value of mutations flag
+tmpfile=$(mktemp)
+echo "${CONFIGSYNC_SPEC//mutationEnabled: false/mutationEnabled: true}" > $tmpfile
 # apply the updated config
-echo "Enabling PolicyController mutations"
-gcloud alpha container hub config-management apply --membership $1 --config $UPDATED_SPEC
+gcloud alpha container hub config-management apply --membership $1 --config $tmpfile
+# cleanup
+rm $tmpfile
