@@ -1,9 +1,117 @@
+# # module "gke" {
+# #   // update to safer-cluster?
+# #   source            = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
+# #   project_id        = var.project_id
+# #   name              = var.cluster_name
+# #   release_channel   = "RAPID"
+# #   regional          = false
+# #   region            = var.region
+# #   zones             = var.zones
+# #   network           = google_compute_network.vpc.name
+# #   subnetwork        = google_compute_subnetwork.subnet.name
+# #   ip_range_pods     = "pods"
+# #   ip_range_services = "services"
+# #   master_ipv4_cidr_block = var.master_ipv4_cidr_block
+# #   network_policy    = true
+# #   enable_shielded_nodes = true
+# #   identity_namespace = "enabled"
+ 
+# #   // Create a new service account (SA) with default IAM permissions as default cluster SA
+# #   // Create separate service account for the non default node pool(s)
+# #   create_service_account = true
+# #   grant_registry_access = true
+
+# #   // Private cluster nodes, public endpoint with authorized networks
+# #   enable_private_nodes = true
+# #   enable_private_endpoint  = false
+# #   master_authorized_networks = [
+# #     {
+# #       display_name: "NAT IP",
+# #       cidr_block : format("%s/32", google_compute_address.nat_ip.address)
+# #     },
+# #     {
+# #       display_name: "Local IP",
+# #       cidr_block : "${chomp(data.http.myip.body)}/32"
+# #     }
+# #   ]
+# #   // open port for ASM
+# #   add_master_webhook_firewall_rules = true
+  
+# #   remove_default_node_pool = true  
+# #   node_pools = [
+# #     // replacement for default pool
+# #     {
+# #       name = "main-pool"
+# #       image_type = "COS_CONTAINERD"
+# #       machine_type = var.client_cluster_machine_type
+# #       min_count  = var.client_cluster_node_count
+# #       max_count = 10      
+# #       auto_upgrade = true
+# #       enable_integrity_monitoring = true
+# #       enable_secure_boot = false
+# #       # sandbox_type = ""
+# #     },
+# #     {
+# #       name = local.tenant_nodepool_name
+# #       image_type = "COS_CONTAINERD"
+# #       machine_type = var.client_cluster_machine_type
+# #       min_count  = 2
+# #       max_count = 10      
+# #       auto_upgrade = true
+# #       enable_integrity_monitoring = true
+# #       enable_secure_boot = false
+# #       # sandbox_type = "gvisor"
+
+# #       # Dedicated service account for the FL pool
+# #       # If the service account resource is reference directly, we get an error. 
+# #       # So just construct the email address as a workaround
+# #       service_account = format("%s@%s.iam.gserviceaccount.com", local.tenant_nodepool_sa_name, var.project_id)
+# #     }
+# #   ]
+  
+# #   node_pools_tags = {
+# #     all = []
+# #   }
+  
+# #   node_pools_labels = {
+# #     all = {}
+# #     "${local.tenant_nodepool_name}" = {
+# #       "tenant" = var.tenant_name
+# #     }
+# #   }
+
+# #   node_pools_taints = {
+# #     all = []
+# #     // taint the FL pool - we use this pool exclusively for FL workloads 
+# #     "${local.tenant_nodepool_name}" = [
+# #       {
+# #         key    = "tenant"
+# #         value  = var.tenant_name
+# #         effect = "NO_EXECUTE"
+# #       },
+# #     ]
+# #   }
+
+#   depends_on = [
+#     module.project-services,
+#     google_service_account.tenant_nodepool_sa
+#   ]
+# }
+
+
 module "gke" {
-  // update to safer-cluster?
-  source            = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
+  # The safer-cluster module sets best practice security defaults, as per the GKE hardening guide.
+  # See the module docs https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/tree/master/modules/safer-cluster
+  # For example, the module enables:
+  #  - network policy
+  #  - workload identity
+  #  - private cluster nodes 
+  #  - shielded nodes  
+  source            = "terraform-google-modules/kubernetes-engine/google//modules/safer-cluster"
+  
   project_id        = var.project_id
   name              = var.cluster_name
-  release_channel   = "RAPID"
+  release_channel   = "RAPID" #TODO: move to stable once 1.21 default
   regional          = false
   region            = var.region
   zones             = var.zones
@@ -12,17 +120,8 @@ module "gke" {
   ip_range_pods     = "pods"
   ip_range_services = "services"
   master_ipv4_cidr_block = var.master_ipv4_cidr_block
-  network_policy    = true
-  enable_shielded_nodes = true
-  identity_namespace = "enabled"
  
-  // Create a new service account (SA) with default IAM permissions as default cluster SA
-  // Create separate service account for the non default node pool(s)
-  create_service_account = true
-  grant_registry_access = true
-
   // Private cluster nodes, public endpoint with authorized networks
-  enable_private_nodes = true
   enable_private_endpoint  = false
   master_authorized_networks = [
     {
@@ -35,9 +134,9 @@ module "gke" {
     }
   ]
   // open port for ASM
-  add_master_webhook_firewall_rules = true
+  add_cluster_firewall_rules = true
+  http_load_balancing = false
   
-  remove_default_node_pool = true  
   node_pools = [
     // replacement for default pool
     {
@@ -82,7 +181,7 @@ module "gke" {
 
   node_pools_taints = {
     all = []
-    // taint the FL pool - we use this pool exclusively for FL workloads 
+    // taint the tenant pool -  this nodepool exclusively for tenant workloads 
     "${local.tenant_nodepool_name}" = [
       {
         key    = "tenant"
