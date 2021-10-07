@@ -64,7 +64,7 @@ variable "asm_version" {
 
 variable "tenant_name" {
     description = "Name of the GKE node pool dedicated to federated learning"
-    default = "fedlearn"
+    default = "tenant"
 }
 
 variable "master_ipv4_cidr_block" {
@@ -74,7 +74,10 @@ variable "master_ipv4_cidr_block" {
 
 locals {
   tenant_nodepool_name = format("%s-pool", var.tenant_name)
-  tenant_nodepool_sa_name = format("gke-%s-%s-sa", var.cluster_name, var.tenant_name)
-  cluster_default_sa_name = format("gke-%s-default-sa", var.cluster_name)
+  tenant_nodepool_sa_name = format("%s-%s-nodes-sa", var.cluster_name, var.tenant_name)
+  # Workload Identity; Google and Kubernetes service accounts
+  tenant_apps_sa_name = format("%s-%s-apps-sa", var.cluster_name, var.tenant_name)
+  tenant_apps_ksa_name = format("%s/ksa", var.tenant_name)
+  
+  cluster_default_sa_name = format("%s-default-sa", var.cluster_name)
 }
-

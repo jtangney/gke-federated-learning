@@ -3,6 +3,7 @@ region="europe-west1"
 # need to be from region above. Cluster nodes created in each zone. 
 zones=["europe-west1-b"]
 cluster_name="flsilo"
+tenant_name="fedlearn"
 
 # Anthos Config Management
 # Update with your own repo, if you created one
