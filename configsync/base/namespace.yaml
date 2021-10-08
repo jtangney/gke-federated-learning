@@ -3,4 +3,6 @@ kind: Namespace
 metadata:
   name: ns
   labels: 
-    istio.io/rev: asm-1104-6
+    # version must match the ASM control plane!
+    # istio.io/rev: asm-1104-14
+    istio.io/rev: asm-110
