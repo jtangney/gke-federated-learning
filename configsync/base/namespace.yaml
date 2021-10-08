@@ -4,6 +4,6 @@ metadata:
   name: ns
   labels: 
     # version must match the ASM control plane!
-    # istio.io/rev: asm-1104-14
+    istio.io/rev: asm-1104-14
     # istio.io/rev: asm-110
-    istio-injection: enabled
+    # istio-injection: enabled
