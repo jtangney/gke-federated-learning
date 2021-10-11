@@ -11,6 +11,7 @@ spec:
     # mode: ALLOW_ANY
   egress:
   - hosts:
-    - '*/*'
+    - 'istio-system/*'
+    - 'testing/*'
     # - 'istio-egress/*'
     # - 'team-x/*'
