@@ -15,6 +15,9 @@ spec:
     protocol: TLS
   resolution: DNS
   location: MESH_EXTERNAL
+  exportTo:
+  - 'istio-system'
+  - 'testing'
 
 ---
 apiVersion: networking.istio.io/v1beta1
@@ -35,3 +38,6 @@ spec:
     protocol: TLS
   resolution: DNS
   location: MESH_EXTERNAL
+  exportTo:
+  - 'istio-system'
+  - 'testing'
