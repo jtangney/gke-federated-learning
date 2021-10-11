@@ -17,9 +17,6 @@ spec:
     protocol: TLS
   resolution: DNS
   location: MESH_EXTERNAL
-  # exportTo:
-  # - 'istio-system'
-  # - 'testing'
 
 ---
 apiVersion: networking.istio.io/v1beta1
@@ -30,9 +27,6 @@ metadata:
 spec:
   hosts:
   - "*.googleapis.com"
-  # - private.googleapis.com
-  # - storage.googleapis.com
-  # - firestore.googleapis.com
   ports:
   - number: 80
     name: http
@@ -42,6 +36,3 @@ spec:
     protocol: TLS
   resolution: DNS
   location: MESH_EXTERNAL
-  # exportTo:
-  # - 'istio-system'
-  # - 'testing'
