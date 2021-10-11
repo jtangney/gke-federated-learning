@@ -7,8 +7,8 @@ metadata:
 spec:
   outboundTrafficPolicy:
     # allow egress only to known destinations
-    mode: REGISTRY_ONLY
-    # mode: ALLOW_ANY
+    # mode: REGISTRY_ONLY
+    mode: ALLOW_ANY
   egress:
   - hosts:
     - '*/*'
