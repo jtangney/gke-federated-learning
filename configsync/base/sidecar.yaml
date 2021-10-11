@@ -9,7 +9,8 @@ spec:
     # allow egress only to known destinations
     mode: REGISTRY_ONLY
     # mode: ALLOW_ANY
-  # egress:
-  # - hosts:
-  #   - 'istio-egress/*'
-  #   - 'team-x/*'
+  egress:
+  - hosts:
+    - '*/*'
+    # - 'istio-egress/*'
+    # - 'team-x/*'
