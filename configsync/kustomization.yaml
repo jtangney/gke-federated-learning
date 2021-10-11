@@ -1,3 +1,5 @@
 resources:
     - constraints-psp.yaml
+    - gateway.yaml
+    - peer-authentication.yaml
     - fedlearn/

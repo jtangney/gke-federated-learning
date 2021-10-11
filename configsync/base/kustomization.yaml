@@ -3,3 +3,4 @@ resources:
     - network-policy.yaml
     - service-account.yaml
     - mutations.yaml
+    - sidecar.yaml
