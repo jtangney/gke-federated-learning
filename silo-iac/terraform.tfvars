@@ -5,6 +5,9 @@ zones=["europe-west1-b"]
 cluster_name="flsilo"
 tenant_name="fedlearn"
 
+asm_version="1.10"
+asm_revision_label="asm-110"
+
 # Anthos Config Management
 # Update with your own repo, if you created one
 # For simplicity, repo is assumed to be publicly accessible ('none' secret)
@@ -12,3 +15,4 @@ acm_repo_location="https://github.com/jtangney/anthos-federation"
 acm_secret_type="none"
 acm_branch="main"
 acm_dir="configsync"
+acm_version="1.9.0"

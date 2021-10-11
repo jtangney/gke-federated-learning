@@ -31,8 +31,7 @@ variable "client_cluster_machine_type" {
 }
 
 variable "acm_version" {
-  description = "The location of the git repo ACM will sync to"
-  default = "1.9.0"
+  description = "ACM version"
 }
 
 variable "acm_repo_location" {
@@ -58,8 +57,11 @@ variable "acm_create_ssh_key" {
 }
 
 variable "asm_version" {
-    description = "ASM version"
-    default     = "1.10"
+  description = "ASM version"
+}
+
+variable "asm_revision_label" {
+  description = "ASM revision label"
 }
 
 variable "tenant_name" {
