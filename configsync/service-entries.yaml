@@ -1,0 +1,37 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: metadata-google-internal
+  namespace: istio-egress
+spec:
+  hosts:
+  - metadata.google.internal
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  - number: 443
+    name: tls
+    protocol: TLS
+  resolution: DNS
+  location: MESH_EXTERNAL
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: private-googleapis-com
+  namespace: istio-egress
+spec:
+  hosts:
+  - private.googleapis.com
+  - storage.googleapis.com
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  - number: 443
+    name: tls
+    protocol: TLS
+  resolution: DNS
+  location: MESH_EXTERNAL

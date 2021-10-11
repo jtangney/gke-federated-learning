@@ -2,6 +2,7 @@ resources:
     - constraints-psp.yaml
     - gateway.yaml
     - peer-authentication.yaml
+    - service-entries.yaml
     # tenant namespaces
     - fedlearn/
     - testing/

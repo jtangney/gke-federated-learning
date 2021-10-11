@@ -6,6 +6,7 @@ metadata:
     kustomizeNamespaced: "true"
 spec:
   outboundTrafficPolicy:
+    # allow egress only to known destinations
     mode: REGISTRY_ONLY
   # egress:
   # - hosts:
