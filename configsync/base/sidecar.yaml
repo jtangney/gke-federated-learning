@@ -1,12 +1,12 @@
-apiVersion: networking.istio.io/v1beta1
-kind: Sidecar
-metadata:
-  name: default
-  labels:
-    kustomizeNamespaced: "true"
-spec:
-  outboundTrafficPolicy:
-    mode: REGISTRY_ONLY
+# apiVersion: networking.istio.io/v1beta1
+# kind: Sidecar
+# metadata:
+#   name: default
+#   labels:
+#     kustomizeNamespaced: "true"
+# spec:
+#   outboundTrafficPolicy:
+#     mode: REGISTRY_ONLY
   # egress:
   # - hosts:
   #   - 'istio-egress/*'
