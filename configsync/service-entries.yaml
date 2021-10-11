@@ -29,9 +29,10 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - private.googleapis.com
-  - storage.googleapis.com
-  - firestore.googleapis.com
+  - "*.googleapis.com"
+  # - private.googleapis.com
+  # - storage.googleapis.com
+  # - firestore.googleapis.com
   ports:
   - number: 80
     name: http
