@@ -44,6 +44,23 @@ patches:
       path: /metadata/annotations/iam.gke.io~1gcp-service-account
       value: flsilo-fedlearn-apps-sa@jtg-db-client1.iam.gserviceaccount.com
 
+
+# change the name for testing!!
+- target:
+    kind: Assign
+    name: mutator-add-nodeaffinity
+  patch: |-
+    - op: replace
+      path: /metadata/name
+      value: testing-mutator-add-nodeaffinity
+- target:
+    kind: Assign
+    name: mutator-add-toleration
+  patch: |-
+    - op: replace
+      path: /metadata/name
+      value: testing-mutator-add-toleration
+
 # update the namespace targeted by mutations
 - target:
     kind: Assign
