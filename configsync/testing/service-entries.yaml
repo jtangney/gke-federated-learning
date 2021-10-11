@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
   name: metadata-google-internal
-  namespace: istio-system
+  namespace: testing
 spec:
   hosts:
   - metadata.google.internal
@@ -24,7 +24,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
   name: private-googleapis-com
-  namespace: istio-system
+  namespace: testing
 spec:
   hosts:
   - private.googleapis.com
