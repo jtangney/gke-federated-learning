@@ -17,7 +17,7 @@ module "asm" {
   enable_gcp_components = true
   enable_registration   = false
   managed_control_plane = false
-  options               = ["cni-gcp"]
+  options               = ["egressgateways", "cni-gcp"]
   // options               = ["envoy-access-log,egressgateways"]
   // custom_overlays       = ["./custom_ingress_gateway.yaml"]
   skip_validation       = true
