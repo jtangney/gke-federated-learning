@@ -19,6 +19,7 @@
 
 resources:
 - ../base
+- peer-authentication.yaml
 
 patches:
 # set namespace name
