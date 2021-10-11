@@ -17,7 +17,7 @@
 # metadata:
 #   name: default-deny-all-ingress
 #   labels:
-#     kustomizeNamespaced: true
+#     kustomizeNamespaced: "true"
 # spec:
 #   podSelector: {}
 #   policyTypes:

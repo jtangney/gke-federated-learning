@@ -3,7 +3,7 @@ kind: Sidecar
 metadata:
   name: default
   labels:
-    kustomizeNamespaced: true
+    kustomizeNamespaced: "true"
 spec:
   outboundTrafficPolicy:
     mode: REGISTRY_ONLY
