@@ -20,7 +20,7 @@
 resources:
 - ../base
 - peer-authentication.yaml
-- service-entries.yaml
+# - service-entries.yaml
 
 patches:
 # set namespace name

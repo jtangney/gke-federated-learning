@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
   name: metadata-google-internal
-  namespace: testing
+  namespace: istio-system
 spec:
   hosts:
   - metadata.google.internal
@@ -26,12 +26,12 @@ apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
   name: private-googleapis-com
-  namespace: testing
+  namespace: istio-system
 spec:
   hosts:
   - private.googleapis.com
   - storage.googleapis.com
-  - firestore.googleapis.com
+  # - firestore.googleapis.com
   ports:
   - number: 80
     name: http
