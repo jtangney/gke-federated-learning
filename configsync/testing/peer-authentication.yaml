@@ -1,3 +1,6 @@
+# TESTING!
+# With a STRICT PeerAuth, we can't even curl via the NodePort; the sidecar proxy
+# rejects anything that it can't authenticate. Which makes sense.
 apiVersion: "security.istio.io/v1beta1"
 kind: "PeerAuthentication"
 metadata:
