@@ -3,7 +3,7 @@ resources:
     # ASM / Istio configs
     - asm/
     # testing
-    - testing/
+    - test/
     # tenant namespaces
     - tenants/fedlearn
     # - tenants/tenant2
