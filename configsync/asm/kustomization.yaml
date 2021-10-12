@@ -3,3 +3,4 @@ resources:
     - peer-authentication.yaml
     - service-entries.yaml
     - virtual-service.yaml
+    - destination-rule.yaml
