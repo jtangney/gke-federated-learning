@@ -1,8 +1,7 @@
 resources:
     - constraints-psp.yaml
-    - gateway.yaml
-    - peer-authentication.yaml
-    - service-entries.yaml
+    # ASM / Istio configs
+    - asm/
     # tenant namespaces
-    - fedlearn/
-    - testing/
+    - tenants/fedlearn
+    # - tenants/tenant2

@@ -5,7 +5,8 @@ apiVersion: "security.istio.io/v1beta1"
 kind: "PeerAuthentication"
 metadata:
   name: "default"
-  namespace: "testing"
+  labels:
+    kustomizeNamespaced: "true"
 spec:
   mtls:
     mode: PERMISSIVE
