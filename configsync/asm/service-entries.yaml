@@ -40,21 +40,21 @@ spec:
   # resolution: DNS
   location: MESH_EXTERNAL
 
-# ---
-# apiVersion: networking.istio.io/v1beta1
-# kind: ServiceEntry
-# metadata:
-#   name: example-com-ext
-#   namespace: istio-system
-# spec:
-#   hosts:
-#   - example.com
-#   ports:
-#   - number: 80
-#     name: http
-#     protocol: HTTP
-#   - number: 443
-#     name: tls
-#     protocol: TLS
-#   # resolution: DNS
-#   location: MESH_EXTERNAL
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: example-com-ext
+  namespace: istio-system
+spec:
+  hosts:
+  - example.com
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  - number: 443
+    name: tls
+    protocol: TLS
+  resolution: DNS
+  location: MESH_EXTERNAL
