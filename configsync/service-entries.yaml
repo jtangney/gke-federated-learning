@@ -27,7 +27,8 @@ metadata:
 spec:
   hosts:
   - private.googleapis.com
-  - "*.googleapis.com"
+  - storage.googleapis.com
+  - firestore.googleapis.com
   ports:
   - number: 80
     name: http
