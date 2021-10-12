@@ -47,7 +47,9 @@ resource "google_service_account_iam_binding" "tenant" {
   role               = "roles/iam.workloadIdentityUser"
 
   members = [
-    format("serviceAccount:%s.svc.id.goog[%s]", var.project_id, local.tenant_apps_ksa_name)
+    format("serviceAccount:%s.svc.id.goog[%s]", var.project_id, local.tenant_apps_ksa_name),
+    # TESTING! Remove me
+    format("serviceAccount:%s.svc.id.goog[%s]", var.project_id, "testing/ksa")
   ]
 }
 
