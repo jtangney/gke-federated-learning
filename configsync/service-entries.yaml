@@ -26,9 +26,10 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - private.googleapis.com
-  - storage.googleapis.com
-  - firestore.googleapis.com
+  - "*".googleapis.com"
+  # - private.googleapis.com
+  # - storage.googleapis.com
+  # - firestore.googleapis.com
   ports:
   - number: 80
     name: http
@@ -36,5 +37,5 @@ spec:
   - number: 443
     name: tls
     protocol: TLS
-  resolution: DNS
+  # resolution: DNS
   location: MESH_EXTERNAL
