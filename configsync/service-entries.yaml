@@ -26,7 +26,7 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - "*".googleapis.com"
+  - "*.googleapis.com"
   # - private.googleapis.com
   # - storage.googleapis.com
   # - firestore.googleapis.com
