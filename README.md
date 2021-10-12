@@ -4,18 +4,21 @@ This repository contains a blueprint that creates Google Cloud infrastructure th
 federated computations such as [federated learning](https://en.wikipedia.org/wiki/Federated_learning). 
 
 Specifically, the blueprint creates and configures a Google Kubernetes Engine (GKE) cluster and related infrastructure
-such that the cluster is ready to participate as a processing node ("silo") in federated computation. The federated
+such that the cluster is ready to participate as a processing node ("silo") in a federated computation. The federated
 computation may involve running untrusted third party code or models, so the cluster is configured according to security
-best practices, and the workers performing federated computation are isolated. The blueprint uses [Anthos](https://cloud.google.com/anthos)
-features to automate and optimise the configuration and security of the cluster.
+best practices, and the apps performing federated computation are hosted on dedicated nodes with additional controls. 
+The blueprint uses [Anthos](https://cloud.google.com/anthos) features to automate and optimise the configuration and security of the cluster.
+
+The initial version of the blueprint creates infrastructure in Google Cloud. It can be extended to Anthos clusters running on premises
+or on other public clouds
 
 ## Requirements / Caveats
-- A Google Cloud project, with billing enabled and with sufficient quota is required.
-- You need Owner permissions on the project
-- The initial version of the blueprint creates infrastructure in Google Cloud. It can be extended to Anthos clusters running on premises or on other public clouds
-- You can deploy the blueprint using Cloud Shell. If you want to execute locally you'll need Terraform, bash, gcloud and kubectl
-- You use Anthos Config Management to configure your cluster. It is recommended to create a new git repository (e.g. on Github) to host cluster configs.
+To deploy this blueprint you need:
+- A Google Cloud project with billing enabled
+- Owner permissions on the project (TODO: tighten this up)
+- It is expected that you deploy the blueprint using Cloud Shell. If you want to execute locally you'll need Terraform, gcloud and kubectl
 - You create the infastructure using Terraform. The blueprint uses a local [backend](https://www.terraform.io/docs/language/settings/backends/configuration.html). It is recommended to configure a remote backend for anything other than experimentation
+- You use Anthos Config Management to configure your cluster. It is recommended to create a new git repository (e.g. on Github) to host cluster configs.
 
 ## Understanding the repository structure
 This repository has the following folders.
@@ -28,6 +31,8 @@ This repository has the following folders.
   
   This folder contains the configuration and policies that are applied to your GKE cluster by Anthos Config
   Management (ACM). It is recommended to copy this directory to a new git repository that you own.
+
+## Architecture
 
 
 ## Deploy the blueprint
