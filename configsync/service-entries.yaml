@@ -31,9 +31,9 @@ spec:
   # - storage.googleapis.com
   # - firestore.googleapis.com
   ports:
-  - number: 80
-    name: http
-    protocol: HTTP
+  # - number: 80
+  #   name: http
+  #   protocol: HTTP
   - number: 443
     name: tls
     protocol: TLS
