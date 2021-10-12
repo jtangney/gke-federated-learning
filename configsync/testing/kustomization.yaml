@@ -44,7 +44,7 @@ patches:
   patch: |-
     - op: replace
       path: /metadata/annotations/iam.gke.io~1gcp-service-account
-      value: flsilo-fedlearn-apps-sa@jtg-db-client1.iam.gserviceaccount.com
+      value: flsilo-fedlearn-apps-sa@jtg-flsilo.iam.gserviceaccount.com
 
 
 # change the name for testing!!
