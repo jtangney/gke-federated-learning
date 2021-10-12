@@ -17,7 +17,7 @@ spec:
     route:
     - destination:
         host: istio-egressgateway.istio-system.svc.cluster.local
-        subset: target-egress-gateway-mTLS
+        # subset: target-egress-gateway-mTLS
         port:
           number: 80
       weight: 100
