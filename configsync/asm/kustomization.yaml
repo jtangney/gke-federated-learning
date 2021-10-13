@@ -1,5 +1,4 @@
 resources:
-  - namespace.yaml
   - gateway.yaml
   - peer-authentication.yaml
   - service-entries.yaml
