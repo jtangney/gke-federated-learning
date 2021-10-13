@@ -5,8 +5,9 @@ federated computations such as [federated learning](https://en.wikipedia.org/wik
 
 Specifically, the blueprint creates and configures a Google Kubernetes Engine (GKE) cluster and related infrastructure
 such that the cluster is ready to participate as a processing node ("silo") in a federated computation. The federated
-computation may involve running untrusted third party code or models, so the cluster is configured according to security
-best practices, and the apps performing federated computation are hosted on dedicated nodes with additional controls. 
+computation may involve running third party apps or models; these third party resources are treated as a tenant
+within the cluster. As the tenant apps performing federated computation are potentially untrusted, the cluster is configured 
+according to security best practices, and the tenant apps are hosted on dedicated nodes with additional controls. 
 The blueprint uses [Anthos](https://cloud.google.com/anthos) features to automate and optimise the configuration and security of the cluster.
 
 The initial version of the blueprint creates infrastructure in Google Cloud. It can be extended to Anthos clusters running on premises
@@ -33,7 +34,25 @@ This repository has the following folders.
   Management (ACM). It is recommended to copy this directory to a new git repository that you own.
 
 ## Architecture
+### Infrastructure
+The following diagram describes the infrastructure created by the blueprint
+![](./assets/infra.png)
 
+The infrastructure includes:
+- A private GKE cluster. The cluster nodes do not have access to the internet.
+- Two GKE node-pools. You create a dedicated node pool to host the tenant apps
+- Firewall rules
+  - Baseline rules that apply to all nodes in the cluster.
+  - Additional rules that apply only to the nodes in the tenant node-pool (via the node Service Account below). These firewall rules limit egress from the tenant nodes.
+- Cloud NAT to allow egress to the internet
+- Cloud DNS rules configured to enable Private Google Access such that apps within the cluster can access Google APIs without traversing the internet
+- Service Accounts used by the cluster. 
+  - A dedicated Service Account used by the nodes in the tenant node-pool
+  - A dedicated Service Account for use by tenant apps (via Workload Identity, discussed later)
+
+### Applications
+The following diagram describes the apps and resources within the GKE cluster
+TBC
 
 ## Deploy the blueprint
 - Open Cloud Shell
