@@ -77,7 +77,7 @@ patches:
   patch: |-
     - op: replace
       path: /spec/parameters/assign/value/0/matchExpressions/0/values/0
-      value: tenant2
+      value: fedlearn
 # update the node-pool selector for the mutations
 - target:
     kind: Assign
@@ -85,4 +85,4 @@ patches:
   patch: |-
     - op: replace
       path: /spec/parameters/assign/value/0/value
-      value: tenant2
+      value: fedlearn
