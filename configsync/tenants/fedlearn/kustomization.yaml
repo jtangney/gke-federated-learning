@@ -33,6 +33,14 @@ patches:
     - op: replace
       path: /metadata/namespace
       value: fedlearn
+# update AuthorizationPolicy
+- target:
+    kind: AuthorizationPolicy
+    name: allow-within-namespace
+  patch: |-
+    - op: replace
+      path: /spec/rules/from/source/namespaces
+      value: [fedlearn]
 # add Workload Identity annotation
 - target:
     kind: ServiceAccount

@@ -4,3 +4,4 @@ resources:
     - service-account.yaml
     - mutations.yaml
     - sidecar.yaml
+    - authorization-policy.yaml
