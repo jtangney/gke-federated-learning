@@ -39,7 +39,7 @@ patches:
     name: allow-within-namespace
   patch: |-
     - op: replace
-      path: /spec/rules/from/source/namespaces
+      path: /spec/rules/0/from/0/source/namespaces
       value: [fedlearn]
 # add Workload Identity annotation
 - target:
