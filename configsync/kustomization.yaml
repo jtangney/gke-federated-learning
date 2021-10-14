@@ -6,4 +6,4 @@ resources:
     - test/
     # tenant namespaces
     - tenants/fedlearn
-    # - tenants/tenant2
+    - tenants/tenant2
