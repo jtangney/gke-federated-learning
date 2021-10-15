@@ -45,6 +45,29 @@ spec:
           number: 80
       weight: 100
 
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: httpbibn-through-egress-gateway
+  namespace: istio-system
+spec:
+  hosts:
+  - httpbin.org
+  gateways:
+  - istio-system/egress-gateway
+  http:
+  - match:
+    - gateways:
+      - istio-system/egress-gateway
+      port: 80
+    route:
+    - destination:
+        host: httpbin.org
+        port:
+          number: 80
+      weight: 100
+
   # - match:
   #   - gateways:
   #     - istio-system/egress-gateway
