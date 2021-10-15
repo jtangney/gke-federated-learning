@@ -27,7 +27,8 @@ spec:
     - gateways:
       - istio-system/egress-gateway
       port: 80
-      prefix: "example.com"
+      uri:
+        prefix: "example.com"
     route:
     - destination:
         host: example.com
@@ -38,7 +39,8 @@ spec:
     - gateways:
       - istio-system/egress-gateway
       port: 80
-      prefix: "httpbin.org"
+      uri:
+        prefix: "httpbin.org"
     route:
     - destination:
         host: httpbin.org
