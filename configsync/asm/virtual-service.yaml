@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: external-hosts-mTLS-egress-gateway
+  name: external-hosts-mtls-egress-gateway
   namespace: istio-system
 spec:
   hosts:
