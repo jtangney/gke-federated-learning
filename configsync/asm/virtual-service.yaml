@@ -6,6 +6,7 @@ metadata:
 spec:
   hosts:
   - example.com
+  - httpbin.org
   gateways:
   - istio-system/egress-gateway
   - mesh

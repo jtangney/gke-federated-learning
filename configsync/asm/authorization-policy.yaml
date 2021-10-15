@@ -1,3 +1,6 @@
+# By default, allow nothing (equivalent to deny all).
+# Applies to all pods in the mesh (as in the root namespace, istio-system)
+# Allowed interactions between services must be explicitly defined
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
@@ -7,6 +10,8 @@ spec:
   {}
 
 ---
+# Allow requests to this set of (external) hosts.
+# No 'from' condition, so requests can originate from anywhere in the mesh
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
@@ -14,14 +19,8 @@ metadata:
   namespace: istio-system
 spec:
   rules:
-    # - from:
-    #   - source:
-    #       namespaces:
-    #       - 'team-x'
-    - to:
-      - operation:
-          hosts:
-            - 'example.com'
-      # when:
-      # - key: destination.port
-      #   values: ["8080"]
+  - to:
+    - operation:
+        hosts:
+        - 'example.com'
+        - 'httpbin.org'

@@ -44,11 +44,12 @@ spec:
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
-  name: example-com-ext
+  name: external-web-hosts
   namespace: istio-system
 spec:
   hosts:
   - example.com
+  - httpbin.org
   ports:
   - number: 80
     name: http
