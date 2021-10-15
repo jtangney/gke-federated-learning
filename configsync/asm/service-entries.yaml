@@ -50,6 +50,7 @@ spec:
   hosts:
   - example.com
   - httpbin.org
+  - google.com
   ports:
   - number: 80
     name: http
