@@ -5,3 +5,23 @@ metadata:
   namespace: istio-system
 spec:
   {}
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-egress-to-specific-hosts
+  namespace: istio-system
+spec:
+  rules:
+    # - from:
+    #   - source:
+    #       namespaces:
+    #       - 'team-x'
+    - to:
+      - operation:
+          hosts:
+            - 'example.com'
+      # when:
+      # - key: destination.port
+      #   values: ["8080"]
