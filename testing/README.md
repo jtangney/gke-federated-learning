@@ -77,3 +77,31 @@ within the tenant namespace, the request also passed the autthorization checks.
 
 ## Verify Anthos Service Mesh egress
 Run some tests to verify egress behaviour of your Anthos Service Mesh
+
+### Verify failed unknown destination host
+The mesh is configured to only allow requests to known services (via the REGISTRY_ONLY outboundTrafficPolicy on the Sidecar resource).
+
+- deploy a test pod to the tenant namespace. They get an Istio sidecar injected  
+`k apply -f ./testing/test.yaml -n fedlearn`
+
+- Verify the pod does have an istio-proxy sidecar container  
+`kubectl -n fedlearn get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
+
+- Make a request to 'example.org'. 
+```
+kubectl -n fedlearn exec -it -c test \
+  $(kubectl -n fedlearn get pod -l app=test -o jsonpath={.items..metadata.name}) \
+  -- curl -i example.org
+```
+
+- You see a 502 error. There is no ServiceEntry for this host (it is not in the service registry) so the request is rejected
+
+### Verify successful request to known host
+- Make a request to 'example.com'. 
+```
+kubectl -n fedlearn exec -it -c test \
+  $(kubectl -n fedlearn get pod -l app=test -o jsonpath={.items..metadata.name}) \
+  -- curl -i example.com
+```
+
+- You see a successful 200 reponse, and the HTML of the page. There is a ServiceEntry for example.com
