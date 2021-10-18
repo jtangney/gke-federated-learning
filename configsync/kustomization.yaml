@@ -1,5 +1,6 @@
 resources:
     - constraints-psp.yaml
+    - rbac.yaml
     # ASM / Istio configs
     - asm/
     # testing

@@ -1,23 +1,68 @@
 # Testing
 
+## Verify firewall rules
+
+### Setup
+- For convenience, create a local variable that describes an output format for firewall rules list. This defines the set of columns
+to display when listing firewall rules    
+```
+FWTABLE="table(
+  name,
+  network,
+  sourceRanges.list():label=[SRC_RANGES],
+  destinationRanges.list():label=[DEST_RANGES],
+  allowed[].map().firewall_rule().list():label=ALLOW,
+  denied[].map().firewall_rule().list():label=DENY,
+  sourceTags.list():label=[SRC_TAGS],
+  targetTags.list():label=[TARGET_TAGS],
+  targetServiceAccounts.list():label=[TARGET_SA]
+)"
+```
+
+### Test firewall rules
+- Print the nodes in the cluster. The node names include the name of the node-pool. Note that the nodes 
+do not have External IP addresses as this is a private cluster.  
+`kubectl get nodes -o wide`
+
+- GKE nodes receieve a label with the node-pool name. Print the nodes in the dedicated tenant node-pool.
+`kubectl get nodes -l cloud.google.com/gke-nodepool=fedlearn-pool`
+
+- Print any firewall rules with 'ssh' in the name, excluding the default network. You see that there is an explicit 'allow ssh' firewall rule 
+that targets any node with the 'gke-flsilo' tag  
+`gcloud compute firewall-rules list  --filter "name~ssh AND -network=default" --format $FWTABLE`
+
+- SSH into one of the tenant nodes.
+`gcloud compute ssh --tunnel-through-iap $(kubectl get nodes -l cloud.google.com/gke-nodepool=fedlearn-pool -o jsonpath='{.items[0].metadata.name}')`
+
+- Make a request to a website. The request times out.   
+`curl -i -m 10 example.com`
+
+- Exit the ssh session  
+`exit`
+
+- Print any firewall rules with 'ssh' in the name. You see that there is an explicit 'allow ssh'
+firewall rule for the network.  
+`gcloud compute firewall-rules list --filter "deny~all"`
+
+
 ## Verify Anthos Service Mesh auth
 Run some tests to verify auth behaviour of your Anthos Service Mesh
 
 ### Setup
 #### Deploy an example tenant service 
 - deploy a simple 'hello world' service to the tenant 'fedlearn' namespace  
-`k apply -f ./testing/hello-service.yaml -n fedlearn`
+`kubectl apply -f ./testing/hello-service.yaml -n fedlearn`
 
 - The tenant namespace is enabled for Istio injection. Verify the pods have an istio-proxy container  
 `kubectl -n fedlearn get pods -l app=hello -o jsonpath='{.items..spec.containers[*].name}'`
 
 - Verify that the tenant pods are all hosted on nodes in the dedicated tenant node-pool
-`k get pods -o wide -n fedlearn`
+`kubectl get pods -o wide -n fedlearn`
 
 ### Verify failed PeerAuthentication
 #### Deploy a test pod that does not have an Istio proxy
 - deploy test pod to the default namespace. You use this test pod to perform requests against the service in the tenant namespace.  
-`k apply -f ./testing/test.yaml -n default`
+`kubectl apply -f ./testing/test.yaml -n default`
 
 - The default namespace is not enabled for Istio injection. Verify the pod does not have an istio-proxy container  
 `kubectl -n default get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
@@ -36,7 +81,7 @@ kubectl -n default exec -it -c test \
 ### Verify failed AuthorizationPolicy
 #### Deploy a test pod that does receive an Istio proxy
 - deploy test pod to the testing namespace. This namespace is enabled for istio injection  
-`k apply -f ./testing/test.yaml -n test`
+`kubectl apply -f ./testing/test.yaml -n test`
 
 - Verify the pod does have an istio-proxy sidecar container  
 `kubectl -n test get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
@@ -57,7 +102,7 @@ only allows requests that originated from the same namespace.
 ### Verify success
 #### Deploy a test pod to the tenant namespace
 - deploy a test pod to the tenant namespace. They get an Istio sidecar injected  
-`k apply -f ./testing/test.yaml -n fedlearn`
+`kubectl apply -f ./testing/test.yaml -n fedlearn`
 
 - Verify the pod does have an istio-proxy sidecar container  
 `kubectl -n fedlearn get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
@@ -82,7 +127,7 @@ Run some tests to verify egress behaviour of your Anthos Service Mesh
 The mesh is configured to only allow requests to known services (via the REGISTRY_ONLY outboundTrafficPolicy on the Sidecar resource).
 
 - deploy a test pod to the tenant namespace. They get an Istio sidecar injected  
-`k apply -f ./testing/test.yaml -n fedlearn`
+`kubectl apply -f ./testing/test.yaml -n fedlearn`
 
 - Verify the pod does have an istio-proxy sidecar container  
 `kubectl -n fedlearn get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
