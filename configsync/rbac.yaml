@@ -4,7 +4,7 @@ metadata:
   name: developer-core
 rules:
 - apiGroups: [""] # "" indicates the core API group
-  resources: ["pods", "services"]
+  resources: ["pods", "services", "deployments", "persistentvolumes", "secrets"]
   verbs: ["*"]
 
 ---
