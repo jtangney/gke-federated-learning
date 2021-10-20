@@ -56,7 +56,7 @@ Run some tests to verify auth behaviour of your Anthos Service Mesh
 - The tenant namespace is enabled for Istio injection. Verify the pods have an istio-proxy container  
 `kubectl -n fedlearn get pods -l app=hello -o jsonpath='{.items..spec.containers[*].name}'`
 
-- Verify that the tenant pods are all hosted on nodes in the dedicated tenant node-pool
+- Verify that the tenant pods are all hosted on nodes in the dedicated tenant node-pool  
 `kubectl get pods -o wide -n fedlearn`
 
 ### Verify failed PeerAuthentication
