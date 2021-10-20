@@ -29,7 +29,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1alpha1
 kind: Assign
 metadata:
-  name: mutator-add-toleration # kpt-set: mutator-add-nodeaffinity-${tenant-name}
+  name: mutator-add-toleration # kpt-set: mutator-add-toleration-${tenant-name}
 spec:
   applyTo:
   - groups: [""]
