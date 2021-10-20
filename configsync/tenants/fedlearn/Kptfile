@@ -15,6 +15,15 @@ upstreamLock:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
     ref: kpt
-    commit: 69ea01c3a59061c8c1ea5728dbcb9a631913f506
+    commit: 13f81ee32172bdced8cccbd32b1f92a732da3e88
 info:
   description: sample description
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
+      configMap:
+        gcp-service-account: flsilo-fedlearn-apps-sa@jtg-flsilo.iam.gserviceaccount.com
+        tenant-developer: jeremy.tangney@gmail.com
+        tenant-name: fedlearn
+  validators:
+    - image: gcr.io/kpt-fn/kubeval:v0.1
