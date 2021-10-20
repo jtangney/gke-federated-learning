@@ -13,3 +13,5 @@ pipeline:
         tenant-developer: $TENANT_USER
   validators:
     - image: gcr.io/kpt-fn/kubeval:v0.1
+      configMap:
+        skip_kinds: Assign
