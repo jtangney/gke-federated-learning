@@ -1,0 +1,9 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: default
+  namespace: ns # kpt-set: ${namespace}
+spec:
+  outboundTrafficPolicy:
+    # allow egress only to known destinations
+    mode: REGISTRY_ONLY
