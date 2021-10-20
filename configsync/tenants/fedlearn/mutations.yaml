@@ -27,7 +27,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1alpha1
 kind: Assign
 metadata: # kpt-merge: /mutator-add-toleration
-  name: mutator-add-nodeaffinity-fedlearn # kpt-set: mutator-add-nodeaffinity-${tenant-name}
+  name: mutator-add-toleration-fedlearn # kpt-set: mutator-add-toleration-${tenant-name}
 spec:
   applyTo:
   - groups: [""]
