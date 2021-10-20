@@ -4,3 +4,12 @@ metadata:
   name: tenant-pkg
 info:
   description: sample description
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
+      configMap:
+        tenant-name: $TENANT_NAME
+        gcp-service-account: $TENANT_GSA
+        tenant-developer: $TENANT_USER
+  validators:
+    - image: gcr.io/kpt-fn/kubeval:v0.1
