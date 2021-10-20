@@ -11,7 +11,3 @@ pipeline:
         tenant-name: $TENANT_NAME
         gcp-service-account: $TENANT_GSA
         tenant-developer: $TENANT_USER
-  validators:
-    - image: gcr.io/kpt-fn/kubeval:v0.1
-      configMap:
-        skip_kinds: Assign
