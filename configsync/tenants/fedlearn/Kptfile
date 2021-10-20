@@ -8,14 +8,14 @@ upstream:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
     ref: kpt
-  updateStrategy: force-delete-replace
+  updateStrategy: resource-merge
 upstreamLock:
   type: git
   git:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
     ref: kpt
-    commit: b7bac0d5f713913e884aa477919ae211f80c5515
+    commit: d29e04fc63b50edd6b7ee859f0bdd6e74dad1229
 info:
   description: sample description
 pipeline:
