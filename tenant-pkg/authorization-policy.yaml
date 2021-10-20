@@ -7,4 +7,5 @@ spec:
   rules:
   - from:
     - source:
-        namespaces: ["ns"] # kpt-set: [${namespace}]
+        namespaces: 
+        - "ns" # kpt-set: ${namespace}
