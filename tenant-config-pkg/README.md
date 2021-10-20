@@ -1,7 +1,9 @@
-# tenant-pkg
+# tenant-config-pkg
 
 ## Description
-sample description
+This package contains resources that define baseline, common configuration for a cluster tenant.
+Each tenant in the cluster should have an instance of this pkg. It defines a dedicated namespace, 
+service account and Istio config for the tenant.
 
 ## Usage
 
