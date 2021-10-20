@@ -1,0 +1,46 @@
+# PolicyController mutations.
+# https://cloud.google.com/anthos-config-management/docs/how-to/mutation#writing_mutators
+# Adds a node affinity to all pods in a specific namespace
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata: # kpt-merge: /mutator-add-nodeaffinity
+  name: mutator-add-nodeaffinity-fedlearn # kpt-set: mutator-add-nodeaffinity-${tenant-name}
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  match:
+    namespaces:
+    - "fedlearn" # kpt-set: ${tenant-name}
+  location: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms"
+  parameters:
+    assign:
+      value:
+      - matchExpressions:
+        - key: "tenant"
+          operator: In
+          values:
+          - "fedlearn" # kpt-set: ${tenant-name}
+---
+# Adds a toleration to all pods in a specific namespace
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata: # kpt-merge: /mutator-add-toleration
+  name: mutator-add-nodeaffinity-fedlearn # kpt-set: mutator-add-nodeaffinity-${tenant-name}
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  match:
+    namespaces:
+    - "fedlearn" # kpt-set: ${tenant-name}
+  location: "spec.tolerations"
+  parameters:
+    assign:
+      value:
+      - key: "tenant"
+        operator: "Equal"
+        value: "fedlearn" # kpt-set: ${tenant-name}
+        effect: "NoExecute"

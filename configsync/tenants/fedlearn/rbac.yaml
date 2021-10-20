@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: # kpt-merge: ns/developer-core-binding
+  name: developer-core-binding
+  namespace: fedlearn # kpt-set: ${tenant-name}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: developer-core
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: jeremy.tangney@gmail.com # kpt-set: ${tenant-developer}
