@@ -40,10 +40,13 @@ The following diagram describes the infrastructure created by the blueprint
 
 The infrastructure includes:
 - A private GKE cluster. The cluster nodes do not have access to the internet.
-- Two GKE node-pools. You create a dedicated node pool to host the tenant apps
+- Two GKE node-pools. 
+  - You create a dedicated node pool to exclusively host tenant apps and resources. The nodes have taints to ensure that only tenant workloads
+  are scheduled onto the tenant nodes
+  - Other cluster resources are hosted in the default node pool.
 - Firewall rules
   - Baseline rules that apply to all nodes in the cluster.
-  - Additional rules that apply only to the nodes in the tenant node-pool (via the node Service Account below). These firewall rules limit egress from the tenant nodes.
+  - Additional rules that apply only to the nodes in the tenant node-pool (targeted using the node Service Account below). These firewall rules limit egress from the tenant nodes.
 - Cloud NAT to allow egress to the internet
 - Cloud DNS rules configured to enable Private Google Access such that apps within the cluster can access Google APIs without traversing the internet
 - Service Accounts used by the cluster. 
@@ -52,7 +55,36 @@ The infrastructure includes:
 
 ### Applications
 The following diagram describes the apps and resources within the GKE cluster
-TBC
+![](./assets/apps.png)
+
+The cluster includes:
+- Anthos Config Management
+  - Config Sync keeps cluster configuration in sync with config defined in a Git repository. The config defines namespaces, service accounts, Policy Controller policies 
+  and Istio resourcess that are applied to the cluster
+  - Policy Controller enforces policies for your clusters. These policies act as "guardrails" and prevent any changes to your cluster that violate security, operational, or compliance controls.
+- Anthos Service Mesh is powered by Istio and enables managed, observable, and secure communication across your services. The mesh configuration is defined in a git repo, and is applied to the cluster using Config Sync. The following points describe how this blueprint configures the service mesh. 
+  - The root istio namespace (istio-system) is configured with
+    - PeerAuthentication resource to allow only STRICT mTLS communications between services in the mesh
+    - AuthorizationPolicies that:
+      - by default deny all communication between services in the mesh, 
+      - allow communication to a set of known external hosts (such as example.com)
+    - Egress Gateway that acts a forward-proxy at the edge of the mesh
+    - VirtualService and DestinationRule resources that route traffic from sidecar proxies through the egress gateway to external destinations.
+  - The tenant namespace is configured for sidecar proxy injection (hence the tenant namespace is part of the mesh). The namespace-level resources include:
+    - Sidecar resource that allows egress only to known hosts (outboundTrafficPolicy: REGISTRY_ONLY)
+    - AuthorizationPolicy that defines the allowed communication paths within the namespace. The blueprint only allows requests that originate from within the same namespace. This
+    policy is added to the root policy in the istio-system namespace
+  - Note that the mesh does not include an Ingress Gateway
+- A dedicated namespace for tenant apps and resources
+  - The tenant namespace is part of the service mesh. Pods in the namespace receive sidecar proxy containers.
+  - The apps and resources in the tenant namespace are hosted on nodes in the dedicated tenant node-pool. 
+    - Any pod deployed to the tenant workspace automatically receives a toleration (related to the node taint above) and nodeSelector to ensure that it is scheudled only a tenant node
+    - The toleration and nodeSelector are automatically applied using Policy Controller mutations
+  - The apps in the tenant namespace use a dedicated Kubernetes service account that is linked to a Google Cloud service account using Workload Identity. This way you can grant appropriate IAM permissions to interact with any required Google APIs.
+  - RBAC rules (RoleBindings) that grant particular users permissions to interact with certain resources in the namespace.
+    - For example, different teams might be responsible for managing apps within each tenant namespace
+    - Users and teams managing tenant apps should not have permissions to change cluster configuration or modify istio resources
+  
 
 ## Deploy the blueprint
 - Open Cloud Shell
