@@ -1,7 +1,0 @@
-resources:
-    - namespace.yaml
-    - network-policy.yaml
-    - service-account.yaml
-    - mutations.yaml
-    - sidecar.yaml
-    - authorization-policy.yaml

@@ -2,10 +2,10 @@ apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
   name: allow-within-namespace
-  labels:
-    kustomizeNamespaced: "true"
+  namespace: ns # kpt-set: ${tenant-name}
 spec:
   rules:
   - from:
     - source:
-        namespaces: ["ns"]
+        namespaces: 
+        - "ns" # kpt-set: ${tenant-name}

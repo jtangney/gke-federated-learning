@@ -1,0 +1,27 @@
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: fedlearn
+upstream:
+  type: git
+  git:
+    repo: https://github.com/jtangney/anthos-federation
+    directory: /tenant-config-pkg
+    ref: kpt
+  updateStrategy: resource-merge
+upstreamLock:
+  type: git
+  git:
+    repo: https://github.com/jtangney/anthos-federation
+    directory: /tenant-config-pkg
+    ref: kpt
+    commit: d29e04fc63b50edd6b7ee859f0bdd6e74dad1229
+info:
+  description: sample description
+pipeline:
+  mutators:
+    - image: gcr.io/kpt-fn/apply-setters:v0.2
+      configMap:
+        gcp-service-account: flsilo-fedlearn-apps-sa@jtg-flsilo.iam.gserviceaccount.com
+        tenant-developer: jeremy.tangney@gmail.com
+        tenant-name: fedlearn

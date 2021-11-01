@@ -1,8 +1,0 @@
-resources:
-  - authorization-policy.yaml
-  - destination-rule.yaml
-  - gateway.yaml
-  - peer-authentication.yaml
-  - service-entries.yaml
-  - virtual-service.yaml
-  

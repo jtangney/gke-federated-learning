@@ -1,3 +1,6 @@
+# ClusterRole that defines a reasonable set of permissions for a developer persona.
+# It is expected that this ClusterRole is used by RoleBindings 
+# such that the user has permissions for a particular namespace.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -9,18 +12,3 @@ rules:
 - apiGroups: ["apps"]
   resources: ["deployments"]
   verbs: ["*"]
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: developer-core-binding
-  namespace: test
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: developer-core
-subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: User
-  name: Jeremy.Tangney@gmail.com
