@@ -24,14 +24,14 @@ FWTABLE="table(
 do not have External IP addresses as this is a private cluster.  
 `kubectl get nodes -o wide`
 
-- GKE nodes receieve a label with the node-pool name. Print the nodes in the dedicated tenant node-pool.
+- GKE nodes receieve a label with the node-pool name. Print the nodes in the dedicated tenant node-pool.  
 `kubectl get nodes -l cloud.google.com/gke-nodepool=fedlearn-pool`
 
 - Print any firewall rules with 'ssh' in the name, excluding the default network. You see that there is an explicit 'allow ssh' firewall rule 
 that targets any node with the 'gke-flsilo' tag  
 `gcloud compute firewall-rules list  --filter "name~ssh AND -network=default" --format $FWTABLE`
 
-- SSH into one of the tenant nodes.
+- SSH into one of the tenant nodes.  
 `gcloud compute ssh --tunnel-through-iap $(kubectl get nodes -l cloud.google.com/gke-nodepool=fedlearn-pool -o jsonpath='{.items[0].metadata.name}')`
 
 - Make a request to a website. The request times out.   
@@ -64,6 +64,9 @@ Run some tests to verify auth behaviour of your Anthos Service Mesh
 - deploy test pod to the default namespace. You use this test pod to perform requests against the service in the tenant namespace.  
 `kubectl apply -f ./testing/test.yaml -n default`
 
+- wait for the pod to be ready  
+`kubectl wait --for=condition=Ready pod -l app=test -n default`
+
 - The default namespace is not enabled for Istio injection. Verify the pod does not have an istio-proxy container  
 `kubectl -n default get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
 
@@ -83,7 +86,10 @@ kubectl -n default exec -it -c test \
 - deploy test pod to the testing namespace. This namespace is enabled for istio injection  
 `kubectl apply -f ./testing/test.yaml -n test`
 
-- Verify the pod does have an istio-proxy sidecar container  
+- wait for the pod to be ready  
+`kubectl wait --for=condition=Ready pod -l app=test -n default`
+
+- Verify the pod has an istio-proxy sidecar container  
 `kubectl -n test get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
 
 #### Test the interaction
@@ -101,7 +107,7 @@ only allows requests that originated from the same namespace.
 
 ### Verify success
 #### Deploy a test pod to the tenant namespace
-- deploy a test pod to the tenant namespace. They get an Istio sidecar injected  
+- deploy a test pod to the tenant namespace. This namespace is enabled for istio injection   
 `kubectl apply -f ./testing/test.yaml -n fedlearn`
 
 - Verify the pod does have an istio-proxy sidecar container  
@@ -126,13 +132,19 @@ Run some tests to verify egress behaviour of your Anthos Service Mesh
 ### Verify failed unknown destination host
 The mesh is configured to only allow requests to known services (via the REGISTRY_ONLY outboundTrafficPolicy on the Sidecar resource).
 
-- deploy a test pod to the tenant namespace. They get an Istio sidecar injected  
+- deploy a test pod to the tenant namespace. This namespace is enabled for istio injection  
 `kubectl apply -f ./testing/test.yaml -n fedlearn`
 
 - Verify the pod does have an istio-proxy sidecar container  
 `kubectl -n fedlearn get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
 
-- Make a request to 'example.org'. 
+- Verify that the tenant namepace has REGISTRY_ONLY outboundTrafficPolicy. Therefore egress from the mesh is only allowed to hosts that exist in the registry  
+`kubectl get sidecar -n fedlearn -o jsonpath='{.items[0].spec.outboundTrafficPolicy}'`
+
+- List the ServiceEntries (TODO: use istioctl). You see that there is a ServiceEntry that configures some external domains (example.com etc)  
+`kubectl get ServiceEntry -A`
+
+- Make a request to 'example.org'. Note that this domain is not configured in the ServiceEntries.  
 ```
 kubectl -n fedlearn exec -it -c test \
   $(kubectl -n fedlearn get pod -l app=test -o jsonpath={.items..metadata.name}) \
