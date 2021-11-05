@@ -1,3 +1,9 @@
+locals {
+  # list of dedicated service accounts used by the tenant nodepools
+  list_tenant_nodepool_sa = [
+    for sa in google_service_account.tenant_nodepool_sa: sa.email
+  ]
+}
 
 // deny all egress from the FL node pool
 resource "google_compute_firewall" "tenantpool-deny-egress" {
@@ -6,27 +12,12 @@ resource "google_compute_firewall" "tenantpool-deny-egress" {
   project       = var.project_id
   network       = google_compute_network.vpc.name
   direction     = "EGRESS"
-  target_service_accounts = [google_service_account.tenant_nodepool_sa.email]
+  target_service_accounts = local.list_tenant_nodepool_sa
   deny {
     protocol = "all"
   }
   priority = 65535
 }
-
-// allow egress from FL node pool within the subnet
-# resource "google_compute_firewall" "flpool_allow_egress_within_subnet" {
-#   name          = "flpool-allow-egress-within-subnet"
-#   description   = "Allow egress from node pool within the subnet" 
-#   project       = var.project_id
-#   network       = google_compute_network.vpc.name
-#   direction     = "EGRESS"
-#   target_service_accounts = [google_service_account.cluster_flpool_sa.email]
-#   destination_ranges = [google_compute_subnetwork.subnet.ip_cidr_range]
-#   allow {
-#     protocol = "all"
-#   }
-#   priority = 1000
-# }
 
 resource "google_compute_firewall" "tenantpool-allow-egress-nodes-pods-services" {
   name          = "tenantpool-allow-egress-nodes-pods-services"
@@ -34,7 +25,7 @@ resource "google_compute_firewall" "tenantpool-allow-egress-nodes-pods-services"
   project       = var.project_id
   network       = google_compute_network.vpc.name
   direction     = "EGRESS"
-  target_service_accounts = [google_service_account.tenant_nodepool_sa.email]
+  target_service_accounts = local.list_tenant_nodepool_sa
   destination_ranges = [google_compute_subnetwork.subnet.ip_cidr_range, "10.20.0.0/14", "10.24.0.0/20"]
   allow {
     protocol = "all"
@@ -48,7 +39,7 @@ resource "google_compute_firewall" "tenantpool-allow-egress-api-server" {
   project       = var.project_id
   network       = google_compute_network.vpc.name
   direction     = "EGRESS"
-  target_service_accounts = [google_service_account.tenant_nodepool_sa.email]
+  target_service_accounts = local.list_tenant_nodepool_sa
   destination_ranges = [var.master_ipv4_cidr_block]
   allow {
     protocol = "tcp"
@@ -57,53 +48,13 @@ resource "google_compute_firewall" "tenantpool-allow-egress-api-server" {
   priority = 1000
 }
 
-# resource "google_compute_firewall" "allow-healthcheck-ingress" {
-#   name          = "allow-healthcheck-ingress"
-#   project       = var.project_id
-#   network       = google_compute_network.vpc.name
-#   direction     = "INGRESS"
-#   source_ranges = ["130.211.0.0/22", "35.191.0.0/16", "209.85.204.0/22"]
-#   allow {
-#     protocol = "tcp"
-#     ports    = ["80", "443"]
-#   }
-# }
-
-# resource "google_compute_firewall" "allow-healthcheck-egress" {
-#   name          = "allow-healthcheck-egress"
-#   project       = var.project_id
-#   network       = google_compute_network.vpc.name
-#   direction     = "EGRESS"
-#   target_service_accounts = [google_service_account.tenant_nodepool_sa.email]
-#   destination_ranges = ["130.211.0.0/22", "35.191.0.0/16", "209.85.204.0/22"]
-#   allow {
-#     protocol = "tcp"
-#     ports    = ["80", "443"]
-#   }
-# }
-
-# resource "google_compute_firewall" "flpool_allow_egress_calico" {
-#   name          = "flpool-allow-egress-calico"
-#   description   = "Allow Calico within the subnet" 
-#   project       = var.project_id
-#   network       = google_compute_network.vpc.name
-#   direction     = "EGRESS"
-#   target_service_accounts = [google_service_account.tenant_nodepool_sa.email]
-#   destination_ranges = [google_compute_subnetwork.subnet.ip_cidr_range]
-#   allow {
-#     protocol = "tcp"
-#     ports = [5473]
-#   }
-#   priority = 1000
-# }
-
 resource "google_compute_firewall" "tenantpool-allow-egress-google-apis" {
   name          = "tenantpool-allow-egress-google-apis"
   description   = "Allow egress from tenant nodepool to Google APIs (private Google access)" 
   project       = var.project_id
   network       = google_compute_network.vpc.name
   direction     = "EGRESS"
-  target_service_accounts = [google_service_account.tenant_nodepool_sa.email]
+  target_service_accounts = local.list_tenant_nodepool_sa
   destination_ranges = ["199.36.153.8/30"]
   allow {
     protocol = "tcp"
@@ -126,16 +77,3 @@ resource "google_compute_firewall" "allow-ssh-tunnel-iap" {
   }
   priority = 1000
 }
-
-// resource "google_compute_firewall" "webhook" {
-//   name    = "allow-master-webhook"
-//   network = google_compute_network.vpc.id
-
-//   allow {
-//     protocol = "tcp"
-//     ports    = ["8443"]
-//   }
-
-//   source_ranges = ["${module.client-cluster.master_ipv4_cidr_block}"]
-//   target_tags = [ "gke-${var.cluster_name_prefix}-client" ]
-// }

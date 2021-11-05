@@ -1,3 +1,37 @@
+locals {
+  # each tenant gets a dedicated nodepool
+  tenant_node_pools = [
+    for tenant_name, config in local.tenants: {
+      name = config.tenant_nodepool_name
+      image_type = "COS_CONTAINERD"
+      machine_type = var.client_cluster_machine_type
+      min_count  = 2
+      max_count = 10      
+      auto_upgrade = true
+      enable_integrity_monitoring = true
+      enable_secure_boot = false
+      # sandbox_type = "gvisor"
+      service_account = format("%s@%s.iam.gserviceaccount.com", config.tenant_nodepool_sa_name, var.project_id)
+    } 
+  ]
+  
+  # add the tenant name as a label to each node in that tenant's nodepool
+  tenant_node_pools_labels = {
+    for tenant_name, config in local.tenants: config.tenant_nodepool_name => {
+      "tenant" = tenant_name
+    }
+  }
+
+  # add a tenant taint to each node in that tenant's nodepool
+  tenant_node_pools_taints  = {
+    for tenant_name, config in local.tenants: config.tenant_nodepool_name => [{
+      key    = "tenant"
+      value  = tenant_name
+      effect = "NO_EXECUTE"
+    }] 
+  }
+}
+
 module "gke" {
   # The safer-cluster module sets best practice security defaults, as per the GKE hardening guide.
   # See the module docs https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/tree/master/modules/safer-cluster
@@ -36,9 +70,9 @@ module "gke" {
   add_cluster_firewall_rules = true
   http_load_balancing = false
   
-  node_pools = [
+  node_pools = concat(
     // replacement for default pool
-    {
+    [{
       name = "main-pool"
       image_type = "COS_CONTAINERD"
       machine_type = var.client_cluster_machine_type
@@ -48,47 +82,24 @@ module "gke" {
       enable_integrity_monitoring = true
       enable_secure_boot = false
       # sandbox_type = ""
-    },
-    {
-      name = local.tenant_nodepool_name
-      image_type = "COS_CONTAINERD"
-      machine_type = var.client_cluster_machine_type
-      min_count  = 2
-      max_count = 10      
-      auto_upgrade = true
-      enable_integrity_monitoring = true
-      enable_secure_boot = false
-      # sandbox_type = "gvisor"
-
-      # Dedicated service account for the FL pool
-      # If the service account resource is reference directly, we get an error. 
-      # So just construct the email address as a workaround
-      service_account = format("%s@%s.iam.gserviceaccount.com", local.tenant_nodepool_sa_name, var.project_id)
-    }
-  ]
+    }],
+    // set of tenant node pools
+    local.tenant_node_pools
+  )
   
   node_pools_tags = {
     all = []
   }
-  
-  node_pools_labels = {
-    all = {}
-    "${local.tenant_nodepool_name}" = {
-      "tenant" = var.tenant_name
-    }
-  }
 
-  node_pools_taints = {
-    all = []
-    // taint the tenant pool -  this nodepool exclusively for tenant workloads 
-    "${local.tenant_nodepool_name}" = [
-      {
-        key    = "tenant"
-        value  = var.tenant_name
-        effect = "NO_EXECUTE"
-      },
-    ]
-  }
+  node_pools_labels = merge(
+    {all = {}}, 
+    local.tenant_node_pools_labels
+  )
+
+  node_pools_taints = merge(
+    {all = []}, 
+    local.tenant_node_pools_taints
+  )
 
   depends_on = [
     module.project-services,
