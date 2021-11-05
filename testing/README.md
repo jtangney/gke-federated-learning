@@ -175,26 +175,49 @@ kubectl -n $TENANT exec -it -c test \
 
 
 ## Verify interaction with Google APIs
+- deploy a test pod to the tenant namespace. This namespace is enabled for istio injection  
+`kubectl apply -f ./testing/test.yaml -n $TENANT`
+
+- wait for the pod to be ready  
+`kubectl wait --for=condition=Ready pod -l app=test -n $TENANT`
 
 - Update the deployment in the tenant namespace, specifying the service account.  
-`kubectl patch deployment test --patch-file ./testing/patch-serviceaccount.yaml`
+`kubectl patch deployment test -n $TENANT --patch-file ./testing/patch-serviceaccount.yaml`
 
 - From the test pod in the tenant namespace, list the Cloud Storage buckets in the project  
 ```
 kubectl -n $TENANT exec -it -c test \
   $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
-  -- gsutil ls
+  -- gsutil ls -p $PROJECT
 ```
 
-- You see a 403 (Permission Denied) error. The pod does not have permissions to list storage buckets
+- You see a 403 (Permission Denied) error. The pod does not have permissions to list storage buckets.
+The cluster is configured for Workload Identity. The 'ksa' Kubernetes Service Account in the tenant namespace 
+is mapped to a named IAM Service Account dedicated to the tenant. 
 
-- The cluster is configured for Workload Identity. The 'ksa' Kubernetes Service Account in the tenant namespace is mapped to a named
-IAM Service Account dedicated to the tenant. List the permissions for the service account used by tenant apps  
+- List the permissions for the service account used by tenant apps. The sevice account does not have any 
+Cloud Storage permissions   
 `gcloud iam service-accounts get-iam-policy $CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com`
 
-- Grant an appropriate IAM role to the Service Account used by apps in the tenant namespace  
+- Grant the Storage Admin IAM role to the Service Account used by apps in the tenant namespace  
 ```
 gcloud projects add-iam-policy-binding $PROJECT \
+  --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
+  --role=roles/storage.admin
+```
+
+- Try to list the Cloud Storage buckets in the project again  
+```
+kubectl -n $TENANT exec -it -c test \
+  $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
+  -- gsutil ls -p $PROJECT
+```
+
+- This time the request succeeds, and you see the default Cloud Storage buckets
+
+- To clean up, remove the Storage Admin role
+```
+gcloud projects remove-iam-policy-binding $PROJECT \
   --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
   --role=roles/storage.admin
 ```
