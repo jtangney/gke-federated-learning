@@ -2,10 +2,10 @@ apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata: # kpt-merge: ns/allow-within-namespace
   name: allow-within-namespace
-  namespace: fedlearn # kpt-set: ${tenant-name}
+  namespace: fltenant1 # kpt-set: ${tenant-name}
 spec:
   rules:
   - from:
     - source:
         namespaces:
-        - "fedlearn" # kpt-set: ${tenant-name}
+        - "fltenant1" # kpt-set: ${tenant-name}

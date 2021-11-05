@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata: # kpt-merge: ns/developer-core-binding
   name: developer-core-binding
-  namespace: fedlearn # kpt-set: ${tenant-name}
+  namespace: fltenant1 # kpt-set: ${tenant-name}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

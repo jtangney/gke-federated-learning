@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: Sidecar
 metadata: # kpt-merge: ns/default
   name: default
-  namespace: fedlearn # kpt-set: ${tenant-name}
+  namespace: fltenant1 # kpt-set: ${tenant-name}
 spec:
   outboundTrafficPolicy:
     # allow egress only to known destinations
