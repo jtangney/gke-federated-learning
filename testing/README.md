@@ -3,8 +3,12 @@
 ## Verify firewall rules
 
 ### Setup
-- Set a local variable with the tenant name  
-`TENANT=fltenant1`
+- Set local variables, replacing with your own values for project, cluster name, tenant name  
+```
+PROJECT=jtg-flsilo
+CLUSTER=fedlearn
+TENANT=fltenant1
+```
 
 - For convenience, create a local variable that describes an output format for firewall rules list. This defines the set of columns
 to display when listing firewall rules    
@@ -150,7 +154,7 @@ The mesh is configured to only allow requests to known services (via the REGISTR
 - List the ServiceEntries (TODO: use istioctl). You see that there is a ServiceEntry that configures some external domains (example.com etc)  
 `kubectl get ServiceEntry -A`
 
-- Make a request to 'example.org'. Note that this domain is not configured in the ServiceEntries.  
+- From the test pod in the tenant namespace, make a request to 'example.org'. Note that this domain is not configured in the ServiceEntries.  
 ```
 kubectl -n $TENANT exec -it -c test \
   $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
@@ -160,7 +164,7 @@ kubectl -n $TENANT exec -it -c test \
 - You see a 502 error. There is no ServiceEntry for this host (it is not in the service registry) so the mesh does not allow the egress
 
 ### Verify successful request to known host
-- Make a request to 'example.com'. 
+- From the test pod in the tenant namespace, make a request to 'example.com'. 
 ```
 kubectl -n $TENANT exec -it -c test \
   $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
@@ -168,3 +172,29 @@ kubectl -n $TENANT exec -it -c test \
 ```
 
 - You see a successful 200 reponse, and the HTML of the page. There is a ServiceEntry for example.com, so the mesh forwards the request
+
+
+## Verify interaction with Google APIs
+
+- Update the deployment in the tenant namespace, specifying the service account.  
+`kubectl patch deployment test --patch-file ./testing/patch-serviceaccount.yaml`
+
+- From the test pod in the tenant namespace, list the Cloud Storage buckets in the project  
+```
+kubectl -n $TENANT exec -it -c test \
+  $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
+  -- gsutil ls
+```
+
+- You see a 403 (Permission Denied) error. The pod does not have permissions to list storage buckets
+
+- The cluster is configured for Workload Identity. The 'ksa' Kubernetes Service Account in the tenant namespace is mapped to a named
+IAM Service Account dedicated to the tenant. List the permissions for the service account used by tenant apps  
+`gcloud iam service-accounts get-iam-policy $CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com`
+
+- Grant an appropriate IAM role to the Service Account used by apps in the tenant namespace  
+```
+gcloud projects add-iam-policy-binding $PROJECT \
+  --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
+  --role=roles/storage.admin
+```
