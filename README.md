@@ -18,20 +18,21 @@ To deploy this blueprint you need:
 - A Google Cloud project with billing enabled
 - Owner permissions on the project (TODO: tighten this up)
 - It is expected that you deploy the blueprint using Cloud Shell. If you want to execute locally you'll need Terraform, gcloud and kubectl
+  - NOTE that installation on Mac does not work well due to problems with ASM installation scripts. Use Cloud Shell.
 - You create the infastructure using Terraform. The blueprint uses a local [backend](https://www.terraform.io/docs/language/settings/backends/configuration.html). It is recommended to configure a remote backend for anything other than experimentation
 - You use Anthos Config Management to configure your cluster. It is recommended to create a new git repository (e.g. on Github) to host cluster configs.
 
 ## Understanding the repository structure
 This repository has the following folders.
 
-* [silo-iac](silo-iac)
-  
-  This folder contains the Terraform code used to create the GKE "silo" cluster and associated infrastructure.
+* [terraform](terraform): contains the Terraform code used to create the GKE "silo" cluster, firewall rules etc. It also installs Anthos components into the cluster
 
-* [configsync](configsync)
-  
-  This folder contains the configuration and policies that are applied to your GKE cluster by Anthos Config
+* [configsync](configsync): contains the configuration and policies that are applied to your GKE cluster by Anthos Config
   Management (ACM). It is recommended to copy this directory to a new git repository that you own.
+
+* [tenant-config-pkg](tenant-config-pkg): a [kpt](https://kpt.dev/?id=overview) package that you can use to configure new tenants in the GKE cluster.
+The package contains baseline tenant resources such as a namespace, service account, and Istio resources.
+
 
 ## Architecture
 ### Infrastructure
@@ -91,8 +92,8 @@ The cluster includes:
 
 - Clone this repo
 
-- Change into the IaC dir  
-  ```cd silo-iac```
+- Change into the directory that contains the Terraform code
+  ```cd terraform```
 
 - Review the `terraform.tfvars` file and replace values appropriately
 
@@ -105,9 +106,15 @@ The cluster includes:
 - Create the plan; review it so you know what's going on  
   ```terraform plan -out terraform.out```
 
-- Apply the plan to create the cluster. Note this may take ~12 minutes to complete  
+- Apply the plan to create the cluster. Note this may take ~15 minutes to complete  
   ```terraform apply terraform.out```
 
 
 ##  Test
-See [testing](testing)
+See [testing](testing) for some manual tests you can perform to verify setup
+
+
+## Add another tenant
+Out-of-the-box the blueprint is configured with a single tenant. You can add more tenants by updating the config. Each tenant is configured in the same way.
+
+See [testing](testing).
