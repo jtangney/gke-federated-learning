@@ -26,7 +26,6 @@ spec:
       labels:
         app: test
     spec:
-      # serviceAccountName: ksa
       containers:
       - name: test
         image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim

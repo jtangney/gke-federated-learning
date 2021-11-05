@@ -1,11 +1,17 @@
-# GKE cluster and other resources created created in this region
+# GKE cluster name
+cluster_name="fedlearn"
+
+# Cluster tenant names. Each tenant gets a dedicated nodepool 
+tenant_names=["fltenant1"]
+
+# GKE cluster created created in this region
 region="europe-west1"
 # need to be from region above. Cluster nodes created in each zone. 
 zones=["europe-west1-b"]
-cluster_name="flsilo"
-tenant_name="fedlearn"
 
+# ASM version; will install the latest patch of this version
 asm_version="1.10"
+# use a standardised revision label for convenience (to avoid re-labelling namespaces per patch)
 asm_revision_label="asm-110"
 
 # Anthos Config Management
