@@ -38,7 +38,7 @@ module "project-iam-bindings" {
 }
 
 resource "google_service_account_iam_binding" "workload_identity" {
-  for_each           = google_service_account.tenant_nodepool_sa
+  for_each           = google_service_account.tenant_apps_sa
   service_account_id = each.value.name
   role               = "roles/iam.workloadIdentityUser"
 
