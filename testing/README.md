@@ -78,7 +78,7 @@ Run some tests to verify auth behaviour of your Anthos Service Mesh
 ```
 kubectl -n default exec -it -c test \
   $(kubectl -n default get pod -l app=test -o jsonpath={.items..metadata.name}) \
-  -- curl hello.fedlearn.svc.cluster.local
+  -- curl hello.$TENANT.svc.cluster.local
 ```
 
 - You see a "Connection reset by peer" failure. 
@@ -113,13 +113,16 @@ only allows requests that originated from the same namespace.
 - deploy a test pod to the tenant namespace. This namespace is enabled for istio injection   
 `kubectl apply -f ./testing/test.yaml -n $TENANT`
 
+- wait for the pod to be ready  
+`kubectl wait --for=condition=Ready pod -l app=test -n $TENANT`
+
 - Verify the pod does have an istio-proxy sidecar container  
 `kubectl -n $TENANT get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
 
 #### Test the interaction
 - From the test pod in the tenant namespace, call the service in the tenant namespace  
 ```
-kubectl -n fedlearn exec -it -c test \
+kubectl -n $TENANT exec -it -c test \
   $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
   -- curl hello.$TENANT.svc.cluster.local
 ```
@@ -149,19 +152,19 @@ The mesh is configured to only allow requests to known services (via the REGISTR
 
 - Make a request to 'example.org'. Note that this domain is not configured in the ServiceEntries.  
 ```
-kubectl -n fedlearn exec -it -c test \
+kubectl -n $TENANT exec -it -c test \
   $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
   -- curl -i example.org
 ```
 
-- You see a 502 error. There is no ServiceEntry for this host (it is not in the service registry) so the request is rejected
+- You see a 502 error. There is no ServiceEntry for this host (it is not in the service registry) so the mesh does not allow the egress
 
 ### Verify successful request to known host
 - Make a request to 'example.com'. 
 ```
-kubectl -n fedlearn exec -it -c test \
+kubectl -n $TENANT exec -it -c test \
   $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
   -- curl -i example.com
 ```
 
-- You see a successful 200 reponse, and the HTML of the page. There is a ServiceEntry for example.com
+- You see a successful 200 reponse, and the HTML of the page. There is a ServiceEntry for example.com, so the mesh forwards the request
