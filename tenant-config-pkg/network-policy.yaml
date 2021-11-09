@@ -27,6 +27,28 @@ spec:
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
+metadata: # kpt-merge: allow-within-own-namespace
+  name: allow-within-own-namespace
+  namespace: ns # kpt-set: ${tenant-name}
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ns # kpt-set: ${tenant-name}
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ns # kpt-set: ${tenant-name}
+
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
 metadata:
   name: allow-egress-istio-system
   namespace: ns # kpt-set: ${tenant-name}
@@ -56,9 +78,9 @@ spec:
         matchLabels:
           kubernetes.io/metadata.name: kube-system
     ports:
-    - port: 53
+    - port: "53"
       protocol: UDP
-    - port: 53
+    - port: "53"
       protocol: TCP
 
 ---
@@ -95,7 +117,7 @@ spec:
         cidr: 127.0.0.1/32
     ports:
     - protocol: TCP
-      port: 988
+      port: "988"
 
 ---
 # TESTING only! Remove this policy for prod.
