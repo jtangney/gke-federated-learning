@@ -94,7 +94,7 @@ kubectl -n default exec -it -c test \
 `kubectl apply -f ./testing/test.yaml -n test`
 
 - wait for the pod to be ready  
-`kubectl wait --for=condition=Ready pod -l app=test -n default`
+`kubectl wait --for=condition=Ready pod -l app=test -n test`
 
 - Verify the pod has an istio-proxy sidecar container  
 `kubectl -n test get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`

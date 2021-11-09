@@ -12,17 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# kind: NetworkPolicy
-# apiVersion: networking.k8s.io/v1
-# metadata:
-#   name: default-deny-all-ingress
-#   labels:
-#     kustomizeNamespaced: "true"
-# spec:
-#   podSelector: {}
-#   policyTypes:
-#   - Ingress
-
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
@@ -109,10 +98,11 @@ spec:
       port: 988
 
 ---
+# TESTING only! Remove this policy for prod.
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: testing-allow-ingress-from-ns-test
+  name: testing-allow-ingress-from-test-app
   namespace: ns # kpt-set: ${tenant-name}
 spec:
   podSelector: {}
@@ -120,6 +110,6 @@ spec:
   - Ingress
   ingress:
   - from:
-    - namespaceSelector:
+    - podSelector:
         matchLabels:
-          kubernetes.io/metadata.name: test
+          app: test
