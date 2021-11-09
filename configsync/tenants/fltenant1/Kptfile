@@ -7,15 +7,15 @@ upstream:
   git:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
-    ref: kpt
+    ref: networkpolicy
   updateStrategy: resource-merge
 upstreamLock:
   type: git
   git:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
-    ref: kpt
-    commit: d29e04fc63b50edd6b7ee859f0bdd6e74dad1229
+    ref: networkpolicy
+    commit: 4fb677adde22ebfac96ce559fe832b4840f9f026
 info:
   description: sample description
 pipeline:
