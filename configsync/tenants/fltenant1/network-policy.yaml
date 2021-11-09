@@ -60,9 +60,9 @@ spec:
         matchLabels:
           kubernetes.io/metadata.name: kube-system
     ports:
-    - port: "53"
+    - port: 53
       protocol: UDP
-    - port: "53"
+    - port: 53
       protocol: TCP
 ---
 kind: NetworkPolicy
@@ -97,7 +97,7 @@ spec:
             cidr: 127.0.0.1/32
       ports:
         - protocol: TCP
-          port: "988"
+          port: 988
 ---
 # TESTING only! Remove this policy for prod.
 # Allow ingress from pods labelled 'app: test' in any namespace
