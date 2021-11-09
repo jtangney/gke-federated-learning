@@ -100,7 +100,7 @@ spec:
           port: 988
 ---
 # TESTING only! Remove this policy for prod.
-# Allow ingress from pods labelled 'app: test' in any namespace
+# Allow ingress from pods labelled 'app: test' in 'test' namespace
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata: # kpt-merge: fltenant1/testing-allow-ingress-from-test-app
@@ -115,3 +115,6 @@ spec:
     - podSelector:
         matchLabels:
           app: test
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: test
