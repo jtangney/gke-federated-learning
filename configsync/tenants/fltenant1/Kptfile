@@ -15,7 +15,7 @@ upstreamLock:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
     ref: networkpolicy
-    commit: 4fb677adde22ebfac96ce559fe832b4840f9f026
+    commit: 9fe29990cb73288a3492bc2f90a302b44b89ade7
 info:
   description: sample description
 pipeline:
