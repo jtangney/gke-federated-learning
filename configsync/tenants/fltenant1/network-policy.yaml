@@ -115,19 +115,3 @@ spec:
     - podSelector:
         matchLabels:
           app: test
----
-# TESTING only! Remove this policy for prod.
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
-metadata: # kpt-merge: ns/testing-allow-ingress-from-test-app
-  name: testing-allow-ingress-from-test-app
-  namespace: fltenant1 # kpt-set: ${tenant-name}
-spec:
-  podSelector: {}
-  policyTypes:
-  - Ingress
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: test

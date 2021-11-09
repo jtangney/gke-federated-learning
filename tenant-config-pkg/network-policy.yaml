@@ -121,6 +121,7 @@ spec:
 
 ---
 # TESTING only! Remove this policy for prod.
+# Allow ingress from pods labelled 'app: test' in any namespace
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
