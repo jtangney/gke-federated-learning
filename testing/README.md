@@ -1,14 +1,26 @@
 # Testing [WIP]
 
-## Verify firewall rules
-
-### Setup
+## Setup
 - Set local variables, replacing with your own values for project, cluster name, tenant name  
 ```
 PROJECT=jtg-flsilo
 CLUSTER=fedlearn
 TENANT=fltenant1
+ASM_REVISION=asm-110
 ```
+
+#### Deploy an example tenant service 
+- deploy a simple 'hello world' service to the tenant 'fedlearn' namespace  
+`kubectl apply -f ./testing/hello-service.yaml -n $TENANT`
+
+- The tenant namespace is enabled for Istio injection. Verify the pods have an istio-proxy container  
+`kubectl -n $TENANT get pods -l app=hello -o jsonpath='{.items..spec.containers[*].name}'`
+
+- Verify that the tenant pods are all hosted on nodes in the dedicated tenant node-pool  
+`kubectl get pods -o wide -n $TENANT`
+
+
+## Verify firewall rules
 
 - For convenience, create a local variable that describes an output format for firewall rules list. This defines the set of columns
 to display when listing firewall rules    
@@ -25,6 +37,7 @@ FWTABLE="table(
   targetServiceAccounts.list():label=[TARGET_SA]
 )"
 ```
+
 
 ### Test firewall rules
 - Print the nodes in the cluster. The node names include the name of the node-pool. Note that the nodes 
@@ -51,23 +64,8 @@ that targets any node with the 'gke-flsilo' tag
 firewall rule for the network.  
 `gcloud compute firewall-rules list --filter "deny~all"`
 
-
-## Verify Anthos Service Mesh auth
-Run some tests to verify auth behaviour of your Anthos Service Mesh
-
-### Setup
-#### Deploy an example tenant service 
-- deploy a simple 'hello world' service to the tenant 'fedlearn' namespace  
-`kubectl apply -f ./testing/hello-service.yaml -n $TENANT`
-
-- The tenant namespace is enabled for Istio injection. Verify the pods have an istio-proxy container  
-`kubectl -n $TENANT get pods -l app=hello -o jsonpath='{.items..spec.containers[*].name}'`
-
-- Verify that the tenant pods are all hosted on nodes in the dedicated tenant node-pool  
-`kubectl get pods -o wide -n $TENANT`
-
-### Verify failed PeerAuthentication
-#### Deploy a test pod that does not have an Istio proxy
+## Verify network policy
+#### Deploy a test pod
 - deploy test pod to the default namespace. You use this test pod to perform requests against the service in the tenant namespace.  
 `kubectl apply -f ./testing/test.yaml -n default`
 
@@ -85,16 +83,47 @@ kubectl -n default exec -it -c test \
   -- curl hello.$TENANT.svc.cluster.local
 ```
 
-- You see a "Connection reset by peer" failure. 
-- The istio-proxy in the metrics-writer pod rejects the request because the tenant namespace has STRICT PeerAuthentication policy. Only authenticated requests are allowed. As the test pod is not part of the mesh (it doesn't have istio-proxy container), the request fails authentication.
+- The call hangs. Terminate the request with CTRL-C, or wait for the request to timeout.
 
-### Verify failed AuthorizationPolicy
-#### Deploy a test pod that does receive an Istio proxy
-- deploy test pod to the testing namespace. This namespace is enabled for istio injection  
+- The network policy in the tenant namespace does not allow requests (ingress) from the default namespace.
+
+## Verify Anthos Service Mesh auth
+Run some tests to verify auth behaviour of your Anthos Service Mesh
+
+### Verify failed PeerAuthentication
+#### Deploy a test pod that does not have an Istio proxy
+- create a new namespace named 'test'  
+`kubectl create namespace test`
+
+- deploy test pod to the test namespace. You use this test pod to perform requests against the service in the tenant namespace.  
 `kubectl apply -f ./testing/test.yaml -n test`
 
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n test`
+
+- The test namespace is not enabled for Istio injection. Verify the pod does not have an istio-proxy container  
+`kubectl -n default get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
+
+#### Test the interation
+- From the test pod in the test namespace, call the service in the tenant namespace  
+```
+kubectl -n test exec -it -c test \
+  $(kubectl -n test get pod -l app=test -o jsonpath={.items..metadata.name}) \
+  -- curl hello.$TENANT.svc.cluster.local
+```
+
+- You see a "Connection reset by peer" failure. 
+- The istio-proxy in the metrics-writer pod rejects the request because the tenant namespace has STRICT PeerAuthentication policy. Only authenticated requests are allowed. As the test pod is not part of the mesh (it doesn't have istio-proxy container), the request fails authentication.
+- **NOTE** that the network policy in the tenant namespace allows requests from the test namespace. Therefore the request is allowed by Kubernetes, and the request then progresses to the tenant service. This network policy is
+included explicitly for testing purposes. You should remove this policy in a production cluster.
+
+### Verify failed AuthorizationPolicy
+#### Deploy a test pod that does receive an Istio proxy
+- enable the test namespace for automatic Istio proxy injection
+`kubectl label namespace test "istio.io/rev=$ASM_REVISION"`
+
+- restart the pods in the test deployment. The new pods receive istio-proxy containers
+`kubectl apply -f ./testing/test.yaml -n test`
 
 - Verify the pod has an istio-proxy sidecar container  
 `kubectl -n test get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
@@ -108,9 +137,7 @@ kubectl -n test exec -it -c test \
 ```
 
 - You see an "RBAC: access denied" failure. 
-- This request came from a pod within the mesh, an mTLS connection between the two istio-proxies was established, and the request was
-successfully authenticated. However, the request was rejected due to AuthorizationPolicy applied to the tenant namespace. The AuthorizationPolicy
-only allows requests that originated from the same namespace.
+- This request came from a pod within the mesh, an mTLS connection between the two istio-proxies was established, and the request was successfully authenticated. However, the request was rejected due to AuthorizationPolicy applied to the tenant namespace. The AuthorizationPolicy only allows requests that originated from the same namespace.
 
 ### Verify success
 #### Deploy a test pod to the tenant namespace
@@ -132,8 +159,8 @@ kubectl -n $TENANT exec -it -c test \
 ```
 
 - The request succeeds! You see some HTML content returned by the hello service.
-- As the request originated from the mesh, the tenant service istio-proxy correctly authenticated the request. As the request originated from
-within the tenant namespace, the request also passed the autthorization checks.
+- The network policy in the tenant namespace allows requests from within the namespace. As the request originated from the mesh, the tenant service istio-proxy correctly authenticated the request. As the request originated from
+within the tenant namespace, the request also passed the authorization checks.
 
 
 ## Verify Anthos Service Mesh egress
@@ -175,13 +202,7 @@ kubectl -n $TENANT exec -it -c test \
 
 
 ## Verify interaction with Google APIs
-- deploy a test pod to the tenant namespace. This namespace is enabled for istio injection  
-`kubectl apply -f ./testing/test.yaml -n $TENANT`
-
-- wait for the pod to be ready  
-`kubectl wait --for=condition=Ready pod -l app=test -n $TENANT`
-
-- Update the deployment in the tenant namespace, specifying the service account.  
+- Update the test deployment in the tenant namespace, adding a service account.  
 `kubectl patch deployment test -n $TENANT --patch-file ./testing/patch-serviceaccount.yaml`
 
 - From the test pod in the tenant namespace, list the Cloud Storage buckets in the project  
