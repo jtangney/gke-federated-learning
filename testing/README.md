@@ -1,16 +1,17 @@
-# Testing [WIP]
+# Testing
+This guide provides step-by-step instructions to manually test and verify cluster configuration.
 
 ## Setup
 - Set local variables, replacing with your own values for project, cluster name, tenant name  
-```
-PROJECT=jtg-flsilo
-CLUSTER=fedlearn
-TENANT=fltenant1
-ASM_REVISION=asm-110
-```
+  ```
+  PROJECT=your_project
+  CLUSTER=fedlearn
+  TENANT=fltenant1
+  ASM_REVISION=asm-110
+  ```
 
 #### Deploy an example tenant service 
-- deploy a simple 'hello world' service to the tenant 'fedlearn' namespace  
+- deploy a simple 'hello world' service to the tenant namespace  
 `kubectl apply -f ./testing/hello-service.yaml -n $TENANT`
 
 - The tenant namespace is enabled for Istio injection. Verify the pods have an istio-proxy container  
@@ -24,19 +25,19 @@ ASM_REVISION=asm-110
 
 - For convenience, create a local variable that describes an output format for firewall rules list. This defines the set of columns
 to display when listing firewall rules    
-```
-FWTABLE="table(
-  name,
-  network,
-  sourceRanges.list():label=[SRC_RANGES],
-  destinationRanges.list():label=[DEST_RANGES],
-  allowed[].map().firewall_rule().list():label=ALLOW,
-  denied[].map().firewall_rule().list():label=DENY,
-  sourceTags.list():label=[SRC_TAGS],
-  targetTags.list():label=[TARGET_TAGS],
-  targetServiceAccounts.list():label=[TARGET_SA]
-)"
-```
+  ```
+  FWTABLE="table(
+    name,
+    network,
+    sourceRanges.list():label=[SRC_RANGES],
+    destinationRanges.list():label=[DEST_RANGES],
+    allowed[].map().firewall_rule().list():label=ALLOW,
+    denied[].map().firewall_rule().list():label=DENY,
+    sourceTags.list():label=[SRC_TAGS],
+    targetTags.list():label=[TARGET_TAGS],
+    targetServiceAccounts.list():label=[TARGET_SA]
+  )"
+  ```
 
 
 ### Test firewall rules
@@ -77,11 +78,11 @@ firewall rule for the network.
 
 #### Test the interation
 - From the test pod in the default namespace, call the service in the tenant namespace  
-```
-kubectl -n default exec -it -c test \
-  $(kubectl -n default get pod -l app=test -o jsonpath={.items..metadata.name}) \
-  -- curl hello.$TENANT.svc.cluster.local
-```
+  ```
+  kubectl -n default exec -it -c test \
+    $(kubectl -n default get pod -l app=test -o jsonpath={.items..metadata.name}) \
+    -- curl hello.$TENANT.svc.cluster.local
+  ```
 
 - The call hangs. Terminate the request with CTRL-C, or wait for the request to timeout.
 
@@ -106,11 +107,11 @@ Run some tests to verify auth behaviour of your Anthos Service Mesh
 
 #### Test the interation
 - From the test pod in the test namespace, call the service in the tenant namespace  
-```
-kubectl -n test exec -it -c test \
-  $(kubectl -n test get pod -l app=test -o jsonpath={.items..metadata.name}) \
-  -- curl hello.$TENANT.svc.cluster.local
-```
+  ```
+  kubectl -n test exec -it -c test \
+    $(kubectl -n test get pod -l app=test -o jsonpath={.items..metadata.name}) \
+    -- curl hello.$TENANT.svc.cluster.local
+  ```
 
 - You see a "Connection reset by peer" failure. 
 - The istio-proxy in the metrics-writer pod rejects the request because the tenant namespace has STRICT PeerAuthentication policy. Only authenticated requests are allowed. As the test pod is not part of the mesh (it doesn't have istio-proxy container), the request fails authentication.
@@ -130,11 +131,11 @@ included explicitly for testing purposes. You should remove this policy in a pro
 
 #### Test the interaction
 - From the test pod in the testing namespace, call the metrics-writer-service in the tenant namespace  
-```
-kubectl -n test exec -it -c test \
-  $(kubectl -n test get pod -l app=test -o jsonpath={.items..metadata.name}) \
-  -- curl hello.$TENANT.svc.cluster.local
-```
+  ```
+  kubectl -n test exec -it -c test \
+    $(kubectl -n test get pod -l app=test -o jsonpath={.items..metadata.name}) \
+    -- curl hello.$TENANT.svc.cluster.local
+  ```
 
 - You see an "RBAC: access denied" failure. 
 - This request came from a pod within the mesh, an mTLS connection between the two istio-proxies was established, and the request was successfully authenticated. However, the request was rejected due to AuthorizationPolicy applied to the tenant namespace. The AuthorizationPolicy only allows requests that originated from the same namespace.
@@ -152,11 +153,11 @@ kubectl -n test exec -it -c test \
 
 #### Test the interaction
 - From the test pod in the tenant namespace, call the service in the tenant namespace  
-```
-kubectl -n $TENANT exec -it -c test \
-  $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
-  -- curl hello.$TENANT.svc.cluster.local
-```
+  ```
+  kubectl -n $TENANT exec -it -c test \
+    $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
+    -- curl hello.$TENANT.svc.cluster.local
+  ```
 
 - The request succeeds! You see some HTML content returned by the hello service.
 - The network policy in the tenant namespace allows requests from within the namespace. As the request originated from the mesh, the tenant service istio-proxy correctly authenticated the request. As the request originated from
@@ -182,21 +183,21 @@ The mesh is configured to only allow requests to known services (via the REGISTR
 `kubectl get ServiceEntry -A`
 
 - From the test pod in the tenant namespace, make a request to 'example.org'. Note that this domain is not configured in the ServiceEntries.  
-```
-kubectl -n $TENANT exec -it -c test \
-  $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
-  -- curl -i example.org
-```
+  ```
+  kubectl -n $TENANT exec -it -c test \
+    $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
+    -- curl -i example.org
+  ```
 
 - You see a 502 error. There is no ServiceEntry for this host (it is not in the service registry) so the mesh does not allow the egress
 
 ### Verify successful request to known host
 - From the test pod in the tenant namespace, make a request to 'example.com'. 
-```
-kubectl -n $TENANT exec -it -c test \
-  $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
-  -- curl -i example.com
-```
+  ```
+  kubectl -n $TENANT exec -it -c test \
+    $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
+    -- curl -i example.com
+  ```
 
 - You see a successful 200 reponse, and the HTML of the page. There is a ServiceEntry for example.com, so the mesh forwards the request
 
@@ -206,42 +207,46 @@ kubectl -n $TENANT exec -it -c test \
 `kubectl patch deployment test -n $TENANT --patch-file ./testing/patch-serviceaccount.yaml`
 
 - From the test pod in the tenant namespace, list the Cloud Storage buckets in the project  
-```
-kubectl -n $TENANT exec -it -c test \
-  $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
-  -- gsutil ls -p $PROJECT
-```
+  ```
+  kubectl -n $TENANT exec -it -c test \
+    $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
+    -- gsutil ls -p $PROJECT
+  ```
 
 - You see a 403 (Permission Denied) error. The pod does not have permissions to list storage buckets.
 The cluster is configured for Workload Identity. The 'ksa' Kubernetes Service Account in the tenant namespace 
 is mapped to a named IAM Service Account dedicated to the tenant. 
 
-- List the permissions for the service account used by tenant apps. The sevice account does not have any 
+- List the IAM permissions for the service account used by tenant apps. The sevice account does not have any 
 Cloud Storage permissions   
-`gcloud iam service-accounts get-iam-policy $CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com`
+  ```
+  gcloud projects get-iam-policy $PROJECT \
+    --flatten="bindings[].members" \ 
+    --filter "bindings.members:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com`
+  ```
 
 - Grant the Storage Admin IAM role to the Service Account used by apps in the tenant namespace  
-```
-gcloud projects add-iam-policy-binding $PROJECT \
-  --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
-  --role=roles/storage.admin
-```
+  ```
+  gcloud projects add-iam-policy-binding $PROJECT \
+    --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
+    --role=roles/storage.admin
+  ```
 
 - Try to list the Cloud Storage buckets in the project again  
-```
-kubectl -n $TENANT exec -it -c test \
-  $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
-  -- gsutil ls -p $PROJECT
-```
+  ```
+  kubectl -n $TENANT exec -it -c test \
+    $(kubectl -n $TENANT get pod -l app=test -o jsonpath={.items..metadata.name}) \
+    -- gsutil ls -p $PROJECT
+  ```
 
 - This time the request succeeds, and you see the default Cloud Storage buckets
 
 - To clean up, remove the Storage Admin role
-```
-gcloud projects remove-iam-policy-binding $PROJECT \
-  --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
-  --role=roles/storage.admin
-```
+  ```
+  gcloud projects remove-iam-policy-binding $PROJECT \
+    --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
+    --role=roles/storage.admin
+  ```
 
 ## Add another tenant
 Out-of-the-box the blueprint is configured with a single tenant. You can add more tenants by updating the config. Each tenant is configured in the same way.
@@ -277,12 +282,12 @@ kpt pkg get $REPO.git/tenant-config-pkg tenant2
 ```
 
 - Confgure the package, updating default values with tenant-specific values. This updates the namespace to be 'tenant2' etc.
-```
-kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.2 -- \
-  tenant-name=tenant2 \
-  gcp-service-account=$CLUSTER-tenant2-apps-sa@$PROJECT.iam.gserviceaccount.com \
-  tenant-developer=someuser@email
-```
+  ```
+  kpt fn eval --image gcr.io/kpt-fn/apply-setters:v0.2 -- \
+    tenant-name=tenant2 \
+    gcp-service-account=$CLUSTER-tenant2-apps-sa@$PROJECT.iam.gserviceaccount.com \
+    tenant-developer=someuser@email
+  ```
 
 - Commit and push the changes to your git repo
 ```
