@@ -1,4 +1,4 @@
-# [WIP] Anthos for federation setup blueprint
+# Blueprint: Preparing a GKE cluster for federated computation
 
 This repository contains a blueprint that creates Google Cloud infrastructure that is ready to participate in 
 federated computations such as [federated learning](https://en.wikipedia.org/wiki/Federated_learning). 
