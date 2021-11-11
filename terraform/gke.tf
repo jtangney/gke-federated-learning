@@ -1,48 +1,3 @@
-locals {
-  default_node_pool = {
-    name = "main-pool"
-    image_type = "COS_CONTAINERD"
-    machine_type = var.cluster_machine_type
-    min_count = 3
-    max_count = 5      
-    auto_upgrade = true
-    enable_integrity_monitoring = true
-    enable_secure_boot = false
-  }
-
-  # each tenant gets a dedicated nodepool
-  tenant_node_pools = [
-    for tenant_name, config in local.tenants: {
-      name = config.tenant_nodepool_name
-      image_type = "COS_CONTAINERD"
-      machine_type = var.cluster_machine_type
-      min_count  = 2
-      max_count = 5      
-      auto_upgrade = true
-      enable_integrity_monitoring = true
-      enable_secure_boot = false
-      # dedicated service account per tenant node pool
-      service_account = format("%s@%s.iam.gserviceaccount.com", config.tenant_nodepool_sa_name, var.project_id)
-    } 
-  ]
-  
-  # add the tenant name as a label to each node in that tenant's nodepool
-  tenant_node_pools_labels = {
-    for tenant_name, config in local.tenants: config.tenant_nodepool_name => {
-      "tenant" = tenant_name
-    }
-  }
-
-  # add a tenant taint to each node in that tenant's nodepool
-  tenant_node_pools_taints  = {
-    for tenant_name, config in local.tenants: config.tenant_nodepool_name => [{
-      key    = "tenant"
-      value  = tenant_name
-      effect = "NO_EXECUTE"
-    }] 
-  }
-}
-
 module "gke" {
   # The safer-cluster module sets best practice security defaults, as per the GKE hardening guide.
   # See the module docs https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/tree/master/modules/safer-cluster
@@ -83,25 +38,46 @@ module "gke" {
   http_load_balancing = false
   
   node_pools = concat(
-    // replacement for default pool
-    [local.default_node_pool],
-    // set of tenant node pools
-    local.tenant_node_pools
+    // default node pool
+    [{
+      name = "main-pool"
+      image_type = "COS_CONTAINERD"
+      machine_type = var.cluster_machine_type
+      min_count = 3
+      max_count = 5      
+      auto_upgrade = true
+      enable_integrity_monitoring = true
+      enable_secure_boot = false
+    }],
+    
+    // list of tenant nodepools
+    [for tenant_name, config in local.tenants: {
+      name = config.tenant_nodepool_name
+      image_type = "COS_CONTAINERD"
+      machine_type = var.cluster_machine_type
+      min_count  = 2
+      max_count = 5      
+      auto_upgrade = true
+      enable_integrity_monitoring = true
+      enable_secure_boot = false
+      # dedicated service account per tenant node pool
+      service_account = format("%s@%s.iam.gserviceaccount.com", config.tenant_nodepool_sa_name, var.project_id)
+    }]
   )
-  
-  node_pools_tags = {
-    all = []
+
+  # Add a label with tenant name to each tenant nodepool
+  node_pools_labels = {
+    for tenant_name, config in local.tenants: config.tenant_nodepool_name => {"tenant" = tenant_name}
   }
 
-  node_pools_labels = merge(
-    {all = {}}, 
-    local.tenant_node_pools_labels
-  )
-
-  node_pools_taints = merge(
-    {all = []}, 
-    local.tenant_node_pools_taints
-  )
+  # Add a taint based on the tenant name to each tenant nodepool
+  node_pools_taints = {
+    for tenant_name, config in local.tenants: config.tenant_nodepool_name => [{
+      key    = "tenant"
+      value  = tenant_name
+      effect = "NO_EXECUTE"
+    }]
+  }
 
   depends_on = [
     module.project-services,
