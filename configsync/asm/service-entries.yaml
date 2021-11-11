@@ -29,7 +29,6 @@ spec:
   - "*.googleapis.com"
   # - private.googleapis.com
   # - storage.googleapis.com
-  # - firestore.googleapis.com
   ports:
   - number: 80
     name: http
@@ -50,7 +49,6 @@ spec:
   hosts:
   - example.com
   - httpbin.org
-  - google.com
   ports:
   - number: 80
     name: http
