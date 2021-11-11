@@ -114,23 +114,26 @@ Run some tests to verify auth behaviour of your Anthos Service Mesh
   ```
 
 - You see a "Connection reset by peer" failure. 
-- The istio-proxy in the metrics-writer pod rejects the request because the tenant namespace has STRICT PeerAuthentication policy. Only authenticated requests are allowed. As the test pod is not part of the mesh (it doesn't have istio-proxy container), the request fails authentication.
+- The istio-proxy in the hello pod rejects the request because the tenant namespace has STRICT PeerAuthentication policy. Only authenticated requests are allowed. As the test pod is not part of the mesh (it doesn't have istio-proxy container), the request fails authentication.
 - **NOTE** that the network policy in the tenant namespace allows requests from the test namespace. Therefore the request is allowed by Kubernetes, and the request then progresses to the tenant service. This network policy is
 included explicitly for testing purposes. You should remove this policy in a production cluster.
 
 ### Verify failed AuthorizationPolicy
 #### Deploy a test pod that does receive an Istio proxy
-- enable the test namespace for automatic Istio proxy injection
+- enable the test namespace for automatic Istio proxy injection  
 `kubectl label namespace test "istio.io/rev=$ASM_REVISION"`
 
-- restart the pods in the test deployment. The new pods receive istio-proxy containers
+- restart the pods in the test deployment. The new pods receive istio-proxy containers  
 `kubectl apply -f ./testing/test.yaml -n test`
 
-- Verify the pod has an istio-proxy sidecar container  
+- wait for the pod to be ready  
+`kubectl wait --for=condition=Ready pod -l app=test -n test`
+
+- Verify the test pod now has an istio-proxy sidecar container  
 `kubectl -n test get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
 
 #### Test the interaction
-- From the test pod in the testing namespace, call the metrics-writer-service in the tenant namespace  
+- From the test pod in the testing namespace, call the service in the tenant namespace  
   ```
   kubectl -n test exec -it -c test \
     $(kubectl -n test get pod -l app=test -o jsonpath={.items..metadata.name}) \
@@ -148,7 +151,7 @@ included explicitly for testing purposes. You should remove this policy in a pro
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n $TENANT`
 
-- Verify the pod does have an istio-proxy sidecar container  
+- Verify the pod has an istio-proxy sidecar container  
 `kubectl -n $TENANT get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
 
 #### Test the interaction
@@ -165,7 +168,8 @@ within the tenant namespace, the request also passed the authorization checks.
 
 
 ## Verify Anthos Service Mesh egress
-Run some tests to verify egress behaviour of your Anthos Service Mesh
+Run some tests to verify egress behaviour of your Anthos Service Mesh.
+**NOTE** that the network policy in the tenant namespace allows egress to the istio-system namespace.
 
 ### Verify failed unknown destination host
 The mesh is configured to only allow requests to known services (via the REGISTRY_ONLY outboundTrafficPolicy on the Sidecar resource).
@@ -203,8 +207,15 @@ The mesh is configured to only allow requests to known services (via the REGISTR
 
 
 ## Verify interaction with Google APIs
-- Update the test deployment in the tenant namespace, adding a service account.  
+- The tenant namespace has a Kubernetes service account resource called 'ksa'. Note that the service account has the 'iam.gke.io/gcp-service-account'
+annotation. This is used by Workload Identity to map the Kubernetes service account to a corresponding IAM service account.  
+`kubectl describe serviceaccount ksa -n $TENANT`
+
+- Update the test deployment in the tenant namespace, adding the 'ksa' service account. The test pods will now use the service account.  
 `kubectl patch deployment test -n $TENANT --patch-file ./testing/patch-serviceaccount.yaml`
+
+- wait for the pod to be ready  
+`kubectl wait --for=condition=Ready pod -l app=test -n $TENANT`
 
 - From the test pod in the tenant namespace, list the Cloud Storage buckets in the project  
   ```

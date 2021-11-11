@@ -1,16 +1,27 @@
 locals {
+  default_node_pool = {
+    name = "main-pool"
+    image_type = "COS_CONTAINERD"
+    machine_type = var.cluster_machine_type
+    min_count = 3
+    max_count = 5      
+    auto_upgrade = true
+    enable_integrity_monitoring = true
+    enable_secure_boot = false
+  }
+
   # each tenant gets a dedicated nodepool
   tenant_node_pools = [
     for tenant_name, config in local.tenants: {
       name = config.tenant_nodepool_name
       image_type = "COS_CONTAINERD"
-      machine_type = var.client_cluster_machine_type
+      machine_type = var.cluster_machine_type
       min_count  = 2
-      max_count = 10      
+      max_count = 5      
       auto_upgrade = true
       enable_integrity_monitoring = true
       enable_secure_boot = false
-      # sandbox_type = "gvisor"
+      # dedicated service account per tenant node pool
       service_account = format("%s@%s.iam.gserviceaccount.com", config.tenant_nodepool_sa_name, var.project_id)
     } 
   ]
@@ -44,7 +55,7 @@ module "gke" {
   
   project_id        = var.project_id
   name              = var.cluster_name
-  release_channel   = "RAPID" #TODO: move to stable once 1.21 default
+  release_channel   = "RAPID" #TODO: move to REGULAR once 1.21 default
   regional          = false
   region            = var.region
   zones             = var.zones
@@ -53,7 +64,7 @@ module "gke" {
   ip_range_pods     = "pods"
   ip_range_services = "services"
   master_ipv4_cidr_block = var.master_ipv4_cidr_block
- 
+  
   // Private cluster nodes, public endpoint with authorized networks
   enable_private_endpoint  = false
   master_authorized_networks = [
@@ -63,26 +74,17 @@ module "gke" {
     },
     {
       display_name: "Local IP",
-      cidr_block : "${chomp(data.http.myip.body)}/32"
+      cidr_block : "${chomp(data.http.installation_workstation_ip.body)}/32"
     }
   ]
-  // open port for ASM
+  // open ports for ASM
   add_cluster_firewall_rules = true
+  // we don't want ingress into the cluster by default
   http_load_balancing = false
   
   node_pools = concat(
     // replacement for default pool
-    [{
-      name = "main-pool"
-      image_type = "COS_CONTAINERD"
-      machine_type = var.client_cluster_machine_type
-      min_count  = var.client_cluster_node_count
-      max_count = 10      
-      auto_upgrade = true
-      enable_integrity_monitoring = true
-      enable_secure_boot = false
-      # sandbox_type = ""
-    }],
+    [local.default_node_pool],
     // set of tenant node pools
     local.tenant_node_pools
   )

@@ -1,5 +1,5 @@
 resource "google_compute_network" "vpc" {
-  name                    = "flsilo-network"
+  name                    = "fedlearn-network"
   project                 = var.project_id
   auto_create_subnetworks = false
 
@@ -25,7 +25,7 @@ resource "google_compute_subnetwork" "subnet" {
 }
 
 resource "google_compute_router" "router" {
-  name    = "my-router"
+  name    = "router"
   region  = google_compute_subnetwork.subnet.region
   network = google_compute_network.vpc.id
 }
@@ -50,6 +50,7 @@ resource "google_compute_router_nat" "nat" {
   }
 }
 
-data "http" "myip" {
+# IP address of the machine that this Terraform operation is running on
+data "http" "installation_workstation_ip" {
   url = "http://ipv4.icanhazip.com"
 }

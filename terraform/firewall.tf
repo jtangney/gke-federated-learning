@@ -6,9 +6,9 @@ locals {
 }
 
 // deny all egress from the FL node pool
-resource "google_compute_firewall" "tenantpool-deny-egress" {
-  name          = "tenantpool-deny-egress"
-  description   = "Default deny egress from tenant nodepool" 
+resource "google_compute_firewall" "tenantpools-deny-egress" {
+  name          = "tenantpools-deny-egress"
+  description   = "Default deny egress from tenant nodepools" 
   project       = var.project_id
   network       = google_compute_network.vpc.name
   direction     = "EGRESS"
@@ -19,9 +19,9 @@ resource "google_compute_firewall" "tenantpool-deny-egress" {
   priority = 65535
 }
 
-resource "google_compute_firewall" "tenantpool-allow-egress-nodes-pods-services" {
-  name          = "tenantpool-allow-egress-nodes-pods-services"
-  description   = "Allow egress from tenant nodepool to cluster nodes, pods and services" 
+resource "google_compute_firewall" "tenantpools-allow-egress-nodes-pods-services" {
+  name          = "tenantpools-allow-egress-nodes-pods-services"
+  description   = "Allow egress from tenant nodepools to cluster nodes, pods and services" 
   project       = var.project_id
   network       = google_compute_network.vpc.name
   direction     = "EGRESS"
@@ -33,9 +33,9 @@ resource "google_compute_firewall" "tenantpool-allow-egress-nodes-pods-services"
   priority = 1000
 }
 
-resource "google_compute_firewall" "tenantpool-allow-egress-api-server" {
-  name          = "tenantpool-allow-egress-api-server"
-  description   = "Allow egress from node pool to the Kubernetes API server" 
+resource "google_compute_firewall" "tenantpools-allow-egress-api-server" {
+  name          = "tenantpools-allow-egress-api-server"
+  description   = "Allow egress from tenant nodepools to the Kubernetes API server" 
   project       = var.project_id
   network       = google_compute_network.vpc.name
   direction     = "EGRESS"
@@ -48,9 +48,9 @@ resource "google_compute_firewall" "tenantpool-allow-egress-api-server" {
   priority = 1000
 }
 
-resource "google_compute_firewall" "tenantpool-allow-egress-google-apis" {
-  name          = "tenantpool-allow-egress-google-apis"
-  description   = "Allow egress from tenant nodepool to Google APIs (private Google access)" 
+resource "google_compute_firewall" "tenantpools-allow-egress-google-apis" {
+  name          = "tenantpools-allow-egress-google-apis"
+  description   = "Allow egress from tenant nodepools to Google APIs (private Google access)" 
   project       = var.project_id
   network       = google_compute_network.vpc.name
   direction     = "EGRESS"

@@ -18,21 +18,20 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "client_cluster_node_count" {
-  description = "The number of nodes in the default node pool"
-  type        = string
-  default     = 3
+variable "tenant_names" {
+  description = "Set of named tenants to be created in the cluster. Each tenant gets a dedicated nodepool, service accounts etc"
+  type = list
 }
 
-variable "client_cluster_machine_type" {
+variable "master_ipv4_cidr_block" {
+  description = "The IP range in CIDR notation to use for the hosted master network"
+  default = "10.0.0.0/28"
+}
+
+variable "cluster_machine_type" {
   description = "The machine type for a default node pool"
   type        = string
   default     = "e2-standard-4"
-}
-
-variable "tenant_names" {
-  description = "Set of named tenants to be created in the cluster"
-  type = list
 }
 
 variable "acm_version" {
@@ -69,13 +68,8 @@ variable "asm_revision_label" {
   description = "ASM revision label"
 }
 
-variable "master_ipv4_cidr_block" {
-  description = "The IP range in CIDR notation to use for the hosted master network"
-  default = "10.0.0.0/28"
-}
-
 locals {
-  cluster_default_sa_name = format("%s-default-sa", var.cluster_name)
+  # cluster_default_sa_name = format("%s-default-sa", var.cluster_name)
 
   # for each tenant, define the names of the nodepool, service accounts etc
   tenants = {
