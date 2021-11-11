@@ -69,8 +69,6 @@ variable "asm_revision_label" {
 }
 
 locals {
-  # cluster_default_sa_name = format("%s-default-sa", var.cluster_name)
-
   # for each tenant, define the names of the nodepool, service accounts etc
   tenants = {
     for name in var.tenant_names: name => {
