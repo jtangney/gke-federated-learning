@@ -3,6 +3,6 @@ kind: Namespace
 metadata:
   name: ns # kpt-set: ${tenant-name}
   labels: 
-    tenant-ns: true
+    tenant-ns: "true"
     # version must match the ASM control plane revision
     istio.io/rev: asm-110 # kpt-set: ${istio-revision}
