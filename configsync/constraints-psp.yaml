@@ -75,3 +75,23 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Service"]
+
+---
+# In tenant namespaces, only allow images to be pulled from
+# a named set of repositories
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedRepos
+metadata:
+  name: repo-is-openpolicyagent
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchLabels:
+          tenant-ns: "true"
+  parameters:
+    repos:
+      - "gcr.io/"
+      - "eu.gcr.io/"
