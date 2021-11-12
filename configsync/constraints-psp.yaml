@@ -2,7 +2,7 @@
 # https://cloud.google.com/anthos-config-management/docs/how-to/using-constraints-to-enforce-pod-security
 
 # prevent privileged containers
-# Note that you need to use the Istio cni-plugin (or else exclude istio-system from the policy)
+# Note that you need to use the Istio cni-plugin (or else exclude istio-system namespace from the policy)
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPPrivilegedContainer
 metadata:
@@ -13,6 +13,34 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
     excludedNamespaces: ["kube-system"]
+
+---
+# prevent privilege escalation
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowPrivilegeEscalationContainer
+metadata:
+  name: psp-allow-privilege-escalation-container
+spec:
+  enforcementAction: dryrun
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+
+---
+# prevent hostPath volumes
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: psp-host-filesystem
+spec:
+  enforcementAction: dryrun
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedHostPaths: []
 
 # ---
 # apiVersion: constraints.gatekeeper.sh/v1beta1
