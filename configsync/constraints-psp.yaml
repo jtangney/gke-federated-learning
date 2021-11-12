@@ -46,13 +46,14 @@ spec:
   parameters:
     allowedHostPaths: []
 
-# ---
-# apiVersion: constraints.gatekeeper.sh/v1beta1
-# kind: K8sPSPReadOnlyRootFilesystem
-# metadata:
-#   name: psp-readonlyrootfilesystem
-# spec:
-#   match:
-#     kinds:
-#       - apiGroups: [""]
-#         kinds: ["Pod"]
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPReadOnlyRootFilesystem
+metadata:
+  name: psp-readonlyrootfilesystem
+spec:
+  enforcementAction: dryrun
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
