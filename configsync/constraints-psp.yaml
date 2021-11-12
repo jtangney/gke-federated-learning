@@ -28,7 +28,7 @@ spec:
         kinds: ["Pod"]
     namespaceSelector:
       matchLabels:
-          tenant-ns: true
+          tenant-ns: "true"
 
 ---
 # prevent hostPath volumes
