@@ -39,18 +39,19 @@ The package contains baseline tenant resources such as a namespace, service acco
 The following diagram describes the infrastructure created by the blueprint
 ![](./assets/infra.png)
 
-The infrastructure includes:
-- A private GKE cluster. The cluster nodes do not have access to the internet.
-- Two GKE node-pools. 
+The infrastructure created by the blueprint includes:
+- A [VPC network](https://cloud.google.com/vpc/docs/vpc) and subnet.
+- A [private GKE cluster](https://cloud.google.com/kubernetes-engine/docs/concepts/private-cluster-concept). The cluster nodes do not have access to the internet.
+- Two GKE [node-pools](https://cloud.google.com/kubernetes-engine/docs/concepts/node-pools). 
   - You create a dedicated node pool to exclusively host tenant apps and resources. The nodes have taints to ensure that only tenant workloads
   are scheduled onto the tenant nodes
   - Other cluster resources are hosted in the default node pool.
-- Firewall rules
+- [VPC Firewall rules](https://cloud.google.com/vpc/docs/firewalls)
   - Baseline rules that apply to all nodes in the cluster.
   - Additional rules that apply only to the nodes in the tenant node-pool (targeted using the node Service Account below). These firewall rules limit egress from the tenant nodes.
-- Cloud NAT to allow egress to the internet
-- Cloud DNS rules configured to enable Private Google Access such that apps within the cluster can access Google APIs without traversing the internet
-- Service Accounts used by the cluster. 
+- [Cloud NAT](https://cloud.google.com/nat/docs/overview) to allow egress to the internet
+- [Cloud DNS](https://cloud.google.com/dns/docs/overview) rules configured to enable [Private Google Access](https://cloud.google.com/vpc/docs/private-google-access) such that apps within the cluster can access Google APIs without traversing the internet
+- [Service Accounts](https://cloud.google.com/iam/docs/understanding-service-accounts) used by the cluster. 
   - A dedicated Service Account used by the nodes in the tenant node-pool
   - A dedicated Service Account for use by tenant apps (via Workload Identity, discussed later)
 
@@ -59,11 +60,13 @@ The following diagram describes the apps and resources within the GKE cluster
 ![](./assets/apps.png)
 
 The cluster includes:
-- Anthos Config Management
-  - Config Sync keeps cluster configuration in sync with config defined in a Git repository. The config defines namespaces, service accounts, Policy Controller policies 
-  and Istio resourcess that are applied to the cluster
-  - Policy Controller enforces policies for your clusters. These policies act as "guardrails" and prevent any changes to your cluster that violate security, operational, or compliance controls.
-- Anthos Service Mesh is powered by Istio and enables managed, observable, and secure communication across your services. The mesh configuration is defined in a git repo, and is applied to the cluster using Config Sync. The following points describe how this blueprint configures the service mesh. 
+- [Anthos Config Management](https://cloud.google.com/anthos/config-management)
+  - [Config Sync](https://cloud.google.com/anthos-config-management/docs/config-sync-overview) keeps cluster configuration in sync with config defined in a Git repository. The config defines namespaces, service accounts, Policy Controller policies and Istio resourcess that are applied to the cluster. See the [configsync](configsync) dir for the full set of resources applied to the cluster
+  - [Policy Controller](https://cloud.google.com/anthos-config-management/docs/concepts/policy-controller) enforces policies ('constraints') for your clusters. These policies act as "guardrails" and prevent any changes to your cluster that violate security, operational, or compliance controls. Inspect the resources in the [configsync/policycontroller](configsync/policycontroller) directory for full details of the constraints. Example policies enforced by the blueprint include:
+    - Selected PodSecurityPolicy constraints
+    - Prevent creation of external services (Ingress, NodePort/LoadBalancer services)
+    - Allow pods to pull container images only from a named set of repos
+- [Anthos Service Mesh](https://cloud.google.com/service-mesh/docs/overview)(ASM) is powered by Istio and enables managed, observable, and secure communication across your services. The mesh configuration is defined in a git repo, and is applied to the cluster using Config Sync. The following points describe how this blueprint configures the service mesh. 
   - The root istio namespace (istio-system) is configured with
     - PeerAuthentication resource to allow only STRICT mTLS communications between services in the mesh
     - AuthorizationPolicies that:
@@ -78,9 +81,10 @@ The cluster includes:
   - Note that the mesh does not include an Ingress Gateway
 - A dedicated namespace for tenant apps and resources
   - The tenant namespace is part of the service mesh. Pods in the namespace receive sidecar proxy containers.
+  - The tenant namespace has network policies to limit traffic between pods. Note that the network policies are in place as defence-in-depth to compliment the Istio/ASM rules
   - The apps and resources in the tenant namespace are hosted on nodes in the dedicated tenant node-pool. 
     - Any pod deployed to the tenant workspace automatically receives a toleration (related to the node taint above) and nodeSelector to ensure that it is scheudled only a tenant node
-    - The toleration and nodeSelector are automatically applied using Policy Controller mutations
+    - The toleration and nodeSelector are automatically applied using [Policy Controller mutations](https://cloud.google.com/anthos-config-management/docs/how-to/mutation)
   - The apps in the tenant namespace use a dedicated Kubernetes service account that is linked to a Google Cloud service account using Workload Identity. This way you can grant appropriate IAM permissions to interact with any required Google APIs.
   - RBAC rules (RoleBindings) that grant particular users permissions to interact with certain resources in the namespace.
     - For example, different teams might be responsible for managing apps within each tenant namespace
