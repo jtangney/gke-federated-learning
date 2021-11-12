@@ -15,22 +15,6 @@ spec:
     excludedNamespaces: ["kube-system"]
 
 ---
-# prevent privilege escalation
-apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sPSPAllowPrivilegeEscalationContainer
-metadata:
-  name: psp-allow-privilege-escalation-container
-spec:
-  enforcementAction: dryrun
-  match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
-    namespaceSelector:
-      matchLabels:
-          tenant-ns: "true"
-
----
 # prevent hostPath volumes
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPHostFilesystem
@@ -47,6 +31,25 @@ spec:
     allowedHostPaths: []
 
 ---
+# prevent privilege escalation
+# Applied in tenant namespaces only
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowPrivilegeEscalationContainer
+metadata:
+  name: psp-allow-privilege-escalation-container
+spec:
+  enforcementAction: dryrun
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchLabels:
+          tenant-ns: "true"
+
+---
+# Require read only filesystem
+# Applied in tenant namespaces only
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPReadOnlyRootFilesystem
 metadata:
@@ -57,3 +60,6 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+    namespaceSelector:
+      matchLabels:
+          tenant-ns: "true"
