@@ -82,7 +82,7 @@ spec:
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sAllowedRepos
 metadata:
-  name: repo-is-openpolicyagent
+  name: known-repos-only
 spec:
   match:
     kinds:
@@ -99,3 +99,14 @@ spec:
       - "us-docker.pkg.dev/"
       - "eu-docker.pkg.dev/"
       
+---
+# Tenant namespaces must include a netowork policy
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequireNamespaceNetworkPolicies
+metadata:
+  name: require-network-policy
+spec:
+  match:
+    namespaceSelector:
+      matchLabels:
+          tenant-ns: "true"
