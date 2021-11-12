@@ -92,6 +92,10 @@ spec:
       matchLabels:
           tenant-ns: "true"
   parameters:
+    # In prod, make these more specific
     repos:
       - "gcr.io/"
       - "eu.gcr.io/"
+      - "us-docker.pkg.dev/"
+      - "eu-docker.pkg.dev/"
+      
