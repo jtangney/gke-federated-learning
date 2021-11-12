@@ -100,13 +100,13 @@ spec:
       - "eu-docker.pkg.dev/"
       
 ---
-# Tenant namespaces must include a netowork policy
+# ASM/Istio DestinationRules must enable TLS
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sRequireNamespaceNetworkPolicies
+kind: DestinationRuleTLSEnabled
 metadata:
-  name: require-network-policy
+  name: istio-destination-rule-tls-required
 spec:
   match:
-    namespaceSelector:
-      matchLabels:
-          tenant-ns: "true"
+    kinds:
+      - apiGroups: ["networking.istio.io"]
+        kinds: ["DestinationRule"]
