@@ -49,7 +49,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1alpha1
 kind: Assign
 metadata: # kpt-merge: /mutator-add-gvisor
-  name: mutator-add-toleration-fltenant1 # kpt-set: mutator-add-toleration-${tenant-name}
+  name: mutator-add-gvisor-fltenant1 # kpt-set: mutator-add-gvisor-${tenant-name}
 spec:
   applyTo:
   - groups: [""]
