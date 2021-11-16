@@ -76,6 +76,9 @@ firewall rule for the network.
 - The default namespace is not enabled for Istio injection. Verify the pod does not have an istio-proxy container  
 `kubectl -n default get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
 
+- Verify that the pods are hosted on nodes in the main node-pool (not in the tenant node-pool)  
+`kubectl -n default get pods -o wide`
+
 #### Test the interation
 - From the test pod in the default namespace, call the service in the tenant namespace  
   ```
@@ -103,7 +106,10 @@ Run some tests to verify auth behaviour of your Anthos Service Mesh
 `kubectl wait --for=condition=Ready pod -l app=test -n test`
 
 - The test namespace is not enabled for Istio injection. Verify the pod does not have an istio-proxy container  
-`kubectl -n default get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
+`kubectl -n test get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
+
+- Verify that the pods are hosted on nodes in the main node-pool (not in the tenant node-pool)  
+`kubectl -n test get pods -o wide`
 
 #### Test the interation
 - From the test pod in the test namespace, call the service in the tenant namespace  
