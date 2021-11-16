@@ -7,15 +7,15 @@ upstream:
   git:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
-    ref: networkpolicy
+    ref: gvisor
   updateStrategy: resource-merge
 upstreamLock:
   type: git
   git:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
-    ref: networkpolicy
-    commit: 15a4c86ffcf5af7410ff0b45a1bf50a47252ba7a
+    ref: gvisor
+    commit: 6831701b57f43cef660aff2486691bea2eb6df7b
 info:
   description: sample description
 pipeline:
