@@ -47,7 +47,7 @@ module "gke" {
       max_count = 5      
       auto_upgrade = true
       enable_integrity_monitoring = true
-      enable_secure_boot = false
+      enable_secure_boot = true
     }],
     
     // list of tenant nodepools
@@ -59,7 +59,9 @@ module "gke" {
       max_count = 5      
       auto_upgrade = true
       enable_integrity_monitoring = true
-      enable_secure_boot = false
+      enable_secure_boot = true
+      # enable gVisor for tenant nodes
+      sandbox_enabled = true
       # dedicated service account per tenant node pool
       service_account = format("%s@%s.iam.gserviceaccount.com", config.tenant_nodepool_sa_name, var.project_id)
     }]
