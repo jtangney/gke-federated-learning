@@ -5,4 +5,4 @@ metadata: # kpt-merge: /ns
   labels:
     tenant-ns: "true"
     # version must match the ASM control plane revision
-    # istio.io/rev: asm-110 # kpt-set: ${istio-revision}
+    istio.io/rev: asm-110 # kpt-set: ${istio-revision}
