@@ -1,12 +1,14 @@
 module "gke" {
-  # The safer-cluster module sets best practice security defaults, as per the GKE hardening guide.
-  # See the module docs https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/tree/master/modules/safer-cluster
-  # For example, the module enables:
-  #  - network policy
+  # The beta-private-cluster enables beta cluster features and opinionated defaults.
+  # See the module docs https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/tree/master/modules/beta-private-cluster
+  # The following configuration creates:
+  #  - private GKE cluster with authorized networks
+  #  - at least 2 node pools (one default pool, plus one per tenant)
   #  - workload identity
-  #  - private cluster nodes 
   #  - shielded nodes  
-  source            = "terraform-google-modules/kubernetes-engine/google//modules/safer-cluster"
+  #  - GKE sandbox (gVisor) for the tenant nodes
+  #  - Dataplane V2 (which automatically enables network policy)
+  source            = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
   
   project_id        = var.project_id
   name              = var.cluster_name
@@ -18,10 +20,21 @@ module "gke" {
   subnetwork        = google_compute_subnetwork.subnet.name
   ip_range_pods     = "pods"
   ip_range_services = "services"
-  master_ipv4_cidr_block = var.master_ipv4_cidr_block
+  
+  enable_shielded_nodes = true
+  enable_binary_authorization = true
+  grant_registry_access = true
+  
+  # Dataplane V2
+  datapath_provider = "ADVANCED_DATAPATH"
+  # automatically enabled with Dataplane V2
+  network_policy = false
   
   // Private cluster nodes, public endpoint with authorized networks
+  enable_private_nodes = true
   enable_private_endpoint  = false
+  master_global_access_enabled = true
+  master_ipv4_cidr_block = var.master_ipv4_cidr_block
   master_authorized_networks = [
     {
       display_name: "NAT IP",
@@ -47,7 +60,7 @@ module "gke" {
       max_count = 5      
       auto_upgrade = true
       enable_integrity_monitoring = true
-      enable_secure_boot = false
+      enable_secure_boot = true
     }],
     
     // list of tenant nodepools
@@ -59,7 +72,9 @@ module "gke" {
       max_count = 5      
       auto_upgrade = true
       enable_integrity_monitoring = true
-      enable_secure_boot = false
+      enable_secure_boot = true
+      # enable GKE sandbox (gVisor) for tenant nodes
+      sandbox_enabled = true
       # dedicated service account per tenant node pool
       service_account = format("%s@%s.iam.gserviceaccount.com", config.tenant_nodepool_sa_name, var.project_id)
     }]

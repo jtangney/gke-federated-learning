@@ -19,7 +19,8 @@ module "asm" {
   # create istio-system namespace
   enable_namespace_creation = true
   # enable egress gateway, CNI - and remove the ingress gateway (not required)
-  options               = ["egressgateways", "no-default-ingress", "envoy-access-log", "cni-gcp"]
+  # options               = ["egressgateways", "no-default-ingress", "envoy-access-log", "cni-gcp"]
+  options               = ["egressgateways", "no-default-ingress", "envoy-access-log"]
   skip_validation       = true
   outdir                = "./install_asm_${var.asm_version}_${module.gke.name}_outdir"
 }

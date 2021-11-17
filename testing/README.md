@@ -76,6 +76,9 @@ firewall rule for the network.
 - The default namespace is not enabled for Istio injection. Verify the pod does not have an istio-proxy container  
 `kubectl -n default get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
 
+- Verify that the pods are hosted on nodes in the main node-pool (not in the tenant node-pool)  
+`kubectl -n default get pods -o wide`
+
 #### Test the interation
 - From the test pod in the default namespace, call the service in the tenant namespace  
   ```
@@ -103,7 +106,10 @@ Run some tests to verify auth behaviour of your Anthos Service Mesh
 `kubectl wait --for=condition=Ready pod -l app=test -n test`
 
 - The test namespace is not enabled for Istio injection. Verify the pod does not have an istio-proxy container  
-`kubectl -n default get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
+`kubectl -n test get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
+
+- Verify that the pods are hosted on nodes in the main node-pool (not in the tenant node-pool)  
+`kubectl -n test get pods -o wide`
 
 #### Test the interation
 - From the test pod in the test namespace, call the service in the tenant namespace  
@@ -124,7 +130,7 @@ included explicitly for testing purposes. You should remove this policy in a pro
 `kubectl label namespace test "istio.io/rev=$ASM_REVISION"`
 
 - restart the pods in the test deployment. The new pods receive istio-proxy containers  
-`kubectl apply -f ./testing/test.yaml -n test`
+`kubectl rollout restart deployment test -n test`
 
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n test`
@@ -214,6 +220,9 @@ annotation. This is used by Workload Identity to map the Kubernetes service acco
 - Update the test deployment in the tenant namespace, adding the 'ksa' service account. The test pods will now use the service account.  
 `kubectl patch deployment test -n $TENANT --patch-file ./testing/patch-serviceaccount.yaml`
 
+- Verify that the test pod has the 'ksa' service account.  
+`kubectl -n $TENANT get pods -l app=test -o jsonpath='{.items..spec.serviceAccount}'`
+
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n $TENANT`
 
@@ -232,15 +241,15 @@ is mapped to a named IAM Service Account dedicated to the tenant.
 Cloud Storage permissions   
   ```
   gcloud projects get-iam-policy $PROJECT \
-    --flatten="bindings[].members" \ 
-    --filter "bindings.members:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com`
+    --flatten="bindings[].members" \
+    --filter "bindings.members:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com"
   ```
 
-- Grant the Storage Admin IAM role to the Service Account used by apps in the tenant namespace  
+- Grant the Viewer IAM role to the Service Account used by apps in the tenant namespace  
   ```
   gcloud projects add-iam-policy-binding $PROJECT \
     --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
-    --role=roles/storage.admin
+    --role=roles/viewer
   ```
 
 - Try to list the Cloud Storage buckets in the project again  
@@ -252,11 +261,11 @@ Cloud Storage permissions
 
 - This time the request succeeds, and you see the default Cloud Storage buckets
 
-- To clean up, remove the Storage Admin role
+- To clean up, remove the IAM role
   ```
   gcloud projects remove-iam-policy-binding $PROJECT \
     --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
-    --role=roles/storage.admin
+    --role=roles/viewer
   ```
 
 ## Add another tenant
