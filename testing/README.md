@@ -130,7 +130,7 @@ included explicitly for testing purposes. You should remove this policy in a pro
 `kubectl label namespace test "istio.io/rev=$ASM_REVISION"`
 
 - restart the pods in the test deployment. The new pods receive istio-proxy containers  
-`kubectl apply -f ./testing/test.yaml -n test`
+`kubectl rollout restart deployment test -n test`
 
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n test`
