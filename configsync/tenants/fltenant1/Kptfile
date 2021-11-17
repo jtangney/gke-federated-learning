@@ -15,7 +15,7 @@ upstreamLock:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
     ref: gvisor
-    commit: 6831701b57f43cef660aff2486691bea2eb6df7b
+    commit: 09f14212ff199db875553173ecf576bc9c2e9394
 info:
   description: sample description
 pipeline:
