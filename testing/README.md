@@ -242,11 +242,11 @@ Cloud Storage permissions
     --filter "bindings.members:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com`
   ```
 
-- Grant the Storage Admin IAM role to the Service Account used by apps in the tenant namespace  
+- Grant the Viewer IAM role to the Service Account used by apps in the tenant namespace  
   ```
   gcloud projects add-iam-policy-binding $PROJECT \
     --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
-    --role=roles/storage.admin
+    --role=roles/viewer
   ```
 
 - Try to list the Cloud Storage buckets in the project again  
@@ -258,11 +258,11 @@ Cloud Storage permissions
 
 - This time the request succeeds, and you see the default Cloud Storage buckets
 
-- To clean up, remove the Storage Admin role
+- To clean up, remove the IAM role
   ```
   gcloud projects remove-iam-policy-binding $PROJECT \
     --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \
-    --role=roles/storage.admin
+    --role=roles/viewer
   ```
 
 ## Add another tenant
