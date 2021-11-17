@@ -220,6 +220,9 @@ annotation. This is used by Workload Identity to map the Kubernetes service acco
 - Update the test deployment in the tenant namespace, adding the 'ksa' service account. The test pods will now use the service account.  
 `kubectl patch deployment test -n $TENANT --patch-file ./testing/patch-serviceaccount.yaml`
 
+- Verify that the test pod has the 'ksa' service account.  
+`kubectl -n $TENANT get pods -l app=test -o jsonpath='{.items..spec.serviceAccount}'`
+
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n $TENANT`
 
@@ -238,8 +241,8 @@ is mapped to a named IAM Service Account dedicated to the tenant.
 Cloud Storage permissions   
   ```
   gcloud projects get-iam-policy $PROJECT \
-    --flatten="bindings[].members" \ 
-    --filter "bindings.members:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com`
+    --flatten="bindings[].members" \
+    --filter "bindings.members:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com"
   ```
 
 - Grant the Viewer IAM role to the Service Account used by apps in the tenant namespace  
