@@ -2,7 +2,7 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata: # kpt-merge: ns/default-deny-all
   name: default-deny-all
-  namespace: fltenant1 # kpt-set: ${tenant-name}
+  namespace: test # kpt-set: ${tenant-name}
 spec:
   podSelector: {}
   policyTypes:
@@ -13,7 +13,7 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata: # kpt-merge: allow-within-own-namespace
   name: allow-within-own-namespace
-  namespace: fltenant1 # kpt-set: ${tenant-name}
+  namespace: test # kpt-set: ${tenant-name}
 spec:
   podSelector: {}
   policyTypes:
@@ -23,18 +23,18 @@ spec:
   - to:
     - namespaceSelector:
         matchLabels:
-          kubernetes.io/metadata.name: fltenant1 # kpt-set: ${tenant-name}
+          kubernetes.io/metadata.name: test # kpt-set: ${tenant-name}
   ingress:
   - from:
     - namespaceSelector:
         matchLabels:
-          kubernetes.io/metadata.name: fltenant1 # kpt-set: ${tenant-name}
+          kubernetes.io/metadata.name: test # kpt-set: ${tenant-name}
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata: # kpt-merge: ns/allow-egress-metadata-server
   name: allow-egress-metadata-server
-  namespace: fltenant1 # kpt-set: ${tenant-name}
+  namespace: test # kpt-set: ${tenant-name}
 spec:
   podSelector: {}
   policyTypes:
@@ -53,7 +53,7 @@ spec:
 # apiVersion: networking.k8s.io/v1
 # metadata: # kpt-merge: ns/allow-egress-metadata-server
 #   name: allow-egress-metadata-server-v2
-#   namespace: fltenant1 # kpt-set: ${tenant-name}
+#   namespace: test # kpt-set: ${tenant-name}
 # spec:
 #   podSelector: {}
 #   policyTypes:
@@ -67,7 +67,7 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata: # kpt-merge: ns/allow-egress-istio-system
   name: allow-egress-istio-system
-  namespace: fltenant1 # kpt-set: ${tenant-name}
+  namespace: test # kpt-set: ${tenant-name}
 spec:
   podSelector: {}
   policyTypes:
@@ -82,7 +82,7 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata: # kpt-merge: ns/allow-egress-kube-system-dns
   name: allow-egress-kube-system-dns
-  namespace: fltenant1 # kpt-set: ${tenant-name}
+  namespace: test # kpt-set: ${tenant-name}
 spec:
   podSelector: {}
   policyTypes:
@@ -102,7 +102,7 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata: # kpt-merge: ns/allow-egress-to-private-google-apis
   name: allow-egress-to-private-google-apis
-  namespace: fltenant1 # kpt-set: ${tenant-name}
+  namespace: test # kpt-set: ${tenant-name}
 spec:
   podSelector: {}
   policyTypes:
@@ -118,7 +118,7 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata: # kpt-merge: fltenant1/testing-allow-ingress-from-test-app
   name: testing-allow-ingress-from-test-app
-  namespace: fltenant1 # kpt-set: ${tenant-name}
+  namespace: test # kpt-set: ${tenant-name}
 spec:
   podSelector: {}
   policyTypes:
