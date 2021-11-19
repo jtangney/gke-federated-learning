@@ -94,7 +94,7 @@ The cluster includes:
 ## Deploy the blueprint
 - Open Cloud Shell
 
-- Clone this repo
+- Fork or clone this repo
 
 - Change into the directory that contains the Terraform code
   ```cd terraform```
