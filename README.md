@@ -119,6 +119,11 @@ See [testing](testing) for some manual tests you can perform to verify setup
 
 
 ## Add another tenant
-Out-of-the-box the blueprint is configured with a single tenant. You can add more tenants by updating the config. Each tenant is configured in the same way.
+Out-of-the-box the blueprint is configured with a single tenant called 'fltenant1'. 
+Adding another tenant is a two-stage process:
+1. Create the project-level infra and resources for the tenant (node pool, service accounts, firewall rules...).
+You do this by updating the Terraform config and re-applying.
+1. Configure cluster-level resources for the tenant (namespace, network policies, service mesh policies...)
+You do this by instantiating and configuring a new version of the tenant kpt package, and then applying to the cluster.
 
-See [testing](testing).
+See the relevant section in [testing](testing) for instructions.

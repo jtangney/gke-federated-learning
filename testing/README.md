@@ -272,6 +272,8 @@ Cloud Storage permissions
 Out-of-the-box the blueprint is configured with a single tenant. You can add more tenants by updating the config. Each tenant is configured in the same way.
 
 ### Create new infra for the new tenant
+First, create the project-level infra and resources for the new tenant.
+
 - Add another element to the `tenant_names` var in `terraform.tfvars`. For example:  
 `tenant_names=["fltenant1", "tenant2"]`
 
@@ -286,8 +288,9 @@ Out-of-the-box the blueprint is configured with a single tenant. You can add mor
 
 
 ### Create cluster configuration for the new tenant
-Now you need to create the cluster configuration for the new tenant (tenant namespace, Istio policies etc). You use the [tenant-config-pkg](tenant-config-pkg) kpt package
-to configure the tenant resources. The tenant config is automatically applied to the cluster using Anthos Config Management
+Now you need to create the cluster-level resources for the new tenant (tenant namespace, network policy, Istio policies etc).
+You use the [tenant-config-pkg](tenant-config-pkg) kpt package to configure the tenant resources. 
+The tenant config is automatically applied to the cluster using Config Sync.
 
 - Change into the directory where tenant configs are stored
 ```

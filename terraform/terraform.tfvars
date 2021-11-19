@@ -1,7 +1,7 @@
 # GKE cluster name
 cluster_name="fedlearn"
 
-# Cluster tenant names. Each tenant gets a dedicated nodepool 
+# Cluster tenant names. Each tenant gets a dedicated nodepool, service accounts etc. 
 tenant_names=["fltenant1"]
 
 # GKE cluster created created in this region
