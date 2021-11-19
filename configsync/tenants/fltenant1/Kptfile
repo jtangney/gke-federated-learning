@@ -15,7 +15,7 @@ upstreamLock:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
     ref: tidyup
-    commit: 5230f542ecde9515b9ca9f6e73627d1ad411fb90
+    commit: a1e40721a693b50667767c7f9a9b6d0cbd6f4c09
 info:
   description: sample description
 pipeline:
