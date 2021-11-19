@@ -13,25 +13,22 @@ The blueprint uses [Anthos](https://cloud.google.com/anthos) features to automat
 The initial version of the blueprint creates infrastructure in Google Cloud. It can be extended to Anthos clusters running on premises
 or on other public clouds
 
-## Requirements / Caveats
+## Getting started
 To deploy this blueprint you need:
 - A Google Cloud project with billing enabled
 - Owner permissions on the project (TODO: tighten this up)
 - It is expected that you deploy the blueprint using Cloud Shell. If you want to execute locally you'll need Terraform, gcloud and kubectl
   - NOTE that installation on Mac does not work well due to problems with ASM installation scripts. Use Cloud Shell.
 - You create the infastructure using Terraform. The blueprint uses a local [backend](https://www.terraform.io/docs/language/settings/backends/configuration.html). It is recommended to configure a remote backend for anything other than experimentation
-- You use Anthos Config Management to configure your cluster. It is recommended to create a new git repository (e.g. on Github) to host cluster configs.
 
 ## Understanding the repository structure
 This repository has the following folders.
 
-* [terraform](terraform): contains the Terraform code used to create the GKE "silo" cluster, firewall rules etc. It also installs Anthos components into the cluster
+* [terraform](terraform): contains the Terraform code used to create the project-level infrastructure and resources, for example a GKE cluster, VPC network, firewall rules etc. It also installs Anthos components into the cluster
 
-* [configsync](configsync): contains the configuration and policies that are applied to your GKE cluster by Anthos Config
-  Management (ACM). It is recommended to copy this directory to a new git repository that you own.
+* [configsync](configsync): contains the cluster-level resources and configurations that are applied to your GKE cluster.
 
-* [tenant-config-pkg](tenant-config-pkg): a [kpt](https://kpt.dev/?id=overview) package that you can use to configure new tenants in the GKE cluster.
-The package contains baseline tenant resources such as a namespace, service account, and Istio resources.
+* [tenant-config-pkg](tenant-config-pkg): a [kpt](https://kpt.dev/?id=overview) package that you can use as a template to configure new tenants in the GKE cluster.
 
 
 ## Architecture
