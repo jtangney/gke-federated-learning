@@ -7,15 +7,15 @@ upstream:
   git:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
-    ref: gvisor
+    ref: tidyup
   updateStrategy: resource-merge
 upstreamLock:
   type: git
   git:
     repo: https://github.com/jtangney/anthos-federation
     directory: /tenant-config-pkg
-    ref: gvisor
-    commit: 09f14212ff199db875553173ecf576bc9c2e9394
+    ref: tidyup
+    commit: 5230f542ecde9515b9ca9f6e73627d1ad411fb90
 info:
   description: sample description
 pipeline:

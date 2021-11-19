@@ -70,7 +70,7 @@ metadata: # kpt-merge: /mutator-add-gvisor
 spec:
   applyTo:
   - groups: [""]
-    kinds: ["Pod"]
+    kinds: ["Deployment"]
     versions: ["v1"]
   match:
     namespaces:
