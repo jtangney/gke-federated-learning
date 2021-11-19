@@ -68,7 +68,7 @@ firewall rule for the network.
 ## Verify network policy
 #### Deploy a test pod
 - deploy test pod to the default namespace. You use this test pod to perform requests against the service in the tenant namespace.  
-`kubectl apply -f ./testing/test.yaml -n default`
+`kubectl apply -f ./testing/test-pod.yaml -n default`
 
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n default`
@@ -100,7 +100,7 @@ Run some tests to verify auth behaviour of your Anthos Service Mesh
 `kubectl create namespace test`
 
 - deploy test pod to the test namespace. You use this test pod to perform requests against the service in the tenant namespace.  
-`kubectl apply -f ./testing/test.yaml -n test`
+`kubectl apply -f ./testing/test-pod.yaml -n test`
 
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n test`
@@ -152,7 +152,7 @@ included explicitly for testing purposes. You should remove this policy in a pro
 ### Verify success
 #### Deploy a test pod to the tenant namespace
 - deploy a test pod to the tenant namespace. This namespace is enabled for istio injection   
-`kubectl apply -f ./testing/test.yaml -n $TENANT`
+`kubectl apply -f ./testing/test-pod.yaml -n $TENANT`
 
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n $TENANT`
@@ -181,7 +181,7 @@ Run some tests to verify egress behaviour of your Anthos Service Mesh.
 The mesh is configured to only allow requests to known services (via the REGISTRY_ONLY outboundTrafficPolicy on the Sidecar resource).
 
 - deploy a test pod to the tenant namespace. This namespace is enabled for istio injection  
-`kubectl apply -f ./testing/test.yaml -n $TENANT`
+`kubectl apply -f ./testing/test-pod.yaml -n $TENANT`
 
 - Verify the pod does have an istio-proxy sidecar container  
 `kubectl -n $TENANT get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`

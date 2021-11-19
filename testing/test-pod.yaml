@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Deploys pods that use the gcloud image; has built-in tools like gsutil and curl
+# that are used in tests.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
