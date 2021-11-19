@@ -69,7 +69,7 @@ metadata: # kpt-merge: /mutator-add-gvisor
   name: mutator-add-gvisor # kpt-set: mutator-add-gvisor-${tenant-name}
 spec:
   applyTo:
-  - groups: [""]
+  - groups: ["apps"]
     kinds: ["Deployment"]
     versions: ["v1"]
   match:
