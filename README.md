@@ -98,6 +98,7 @@ The cluster includes:
     - VirtualService and DestinationRule resources that route traffic from sidecar proxies through the egress gateway to external destinations.
   - The tenant namespace is configured for automatic sidecar proxy injection, see next section. 
   - Note that the mesh does not include an Ingress Gateway
+  - See the [servicemesh](configsync/servicemesh) dir for the cluster-level mesh config
 
 The blueprint configures a dedicated namespace for tenant apps and resources:
   - The tenant namespace is part of the service mesh. Pods in the namespace receive sidecar proxy containers. The namespace-level mesh resources include:
