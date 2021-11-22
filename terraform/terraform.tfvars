@@ -1,7 +1,7 @@
 # GKE cluster name
 cluster_name="fedlearn"
 
-# Cluster tenant names. Each tenant gets a dedicated nodepool 
+# Cluster tenant names. Each tenant gets a dedicated nodepool, service accounts etc. 
 tenant_names=["fltenant1"]
 
 # GKE cluster created created in this region
@@ -15,7 +15,7 @@ asm_version="1.10"
 asm_revision_label="asm-110"
 
 # Anthos Config Management
-# Update with your own repo, if you created one
+# Update with your own repo URL, if you created one
 # For simplicity, repo is assumed to be publicly accessible ('none' secret)
 acm_repo_location="https://github.com/jtangney/anthos-federation"
 acm_secret_type="none"

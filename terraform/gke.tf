@@ -12,7 +12,7 @@ module "gke" {
   
   project_id        = var.project_id
   name              = var.cluster_name
-  release_channel   = "RAPID" #TODO: move to REGULAR once 1.21 default
+  release_channel   = "REGULAR"
   regional          = false
   region            = var.region
   zones             = var.zones
