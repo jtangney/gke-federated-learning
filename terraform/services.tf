@@ -7,6 +7,7 @@ module "project-services" {
     "anthos.googleapis.com",
     "anthosconfigmanagement.googleapis.com",
     "cloudbilling.googleapis.com",
+    "cloudkms.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "cloudtrace.googleapis.com",
     "compute.googleapis.com",

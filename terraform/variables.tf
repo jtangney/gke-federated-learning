@@ -14,7 +14,7 @@ variable "zones" {
 }
 
 variable "cluster_name" {
-  description = "The prefix of the Kubernetes cluster name"
+  description = "The Kubernetes cluster name"
   type        = string
 }
 
@@ -32,6 +32,12 @@ variable "cluster_machine_type" {
   description = "The machine type for a default node pool"
   type        = string
   default     = "e2-standard-4"
+}
+
+variable "cluster_secrets_encyption_keyname" {
+  description = "The name of the Cloud KMS key used to encrypt cluster secrets"
+  type        = string
+  default     = "clusterSecretsKey"
 }
 
 variable "acm_version" {
@@ -76,5 +82,6 @@ locals {
       tenant_nodepool_sa_name = format("%s-%s-nodes-sa", var.cluster_name, name)
       tenant_apps_sa_name     = format("%s-%s-apps-sa", var.cluster_name, name)
     }
-  }
+  }    
+  gke_robot_sa  = "service-${data.google_project.project.number}@container-engine-robot.iam.gserviceaccount.com"
 }
