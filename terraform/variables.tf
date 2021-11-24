@@ -34,7 +34,7 @@ variable "cluster_machine_type" {
   default     = "e2-standard-4"
 }
 
-variable "cluster_secrets_encyption_keyname" {
+variable "cluster_secrets_keyname" {
   description = "The name of the Cloud KMS key used to encrypt cluster secrets"
   type        = string
   default     = "clusterSecretsKey"

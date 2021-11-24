@@ -30,7 +30,7 @@ module "gke" {
   
   # Encrypt cluster secrets at the application layer
   database_encryption = [{
-      "key_name": module.kms.keys[var.clusterSecretsKey],
+      "key_name": module.kms.keys[var.cluster_secrets_keyname],
       "state": "ENCRYPTED"
   }]
 
