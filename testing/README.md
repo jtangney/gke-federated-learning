@@ -70,14 +70,14 @@ firewall rule for the network.
 - deploy test pod to the default namespace. You use this test pod to perform requests against the service in the tenant namespace.  
 `kubectl apply -f ./testing/test-pod.yaml -n default`
 
+- Verify that the pods are hosted on nodes in the main node-pool (not in the tenant node-pool)  
+`kubectl -n default get pods -o wide`
+
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n default`
 
 - The default namespace is not enabled for Istio injection. Verify the pod does not have an istio-proxy container  
 `kubectl -n default get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
-
-- Verify that the pods are hosted on nodes in the main node-pool (not in the tenant node-pool)  
-`kubectl -n default get pods -o wide`
 
 #### Test the interation
 - From the test pod in the default namespace, call the service in the tenant namespace  
@@ -102,14 +102,14 @@ Run some tests to verify auth behaviour of your Anthos Service Mesh
 - deploy test pod to the test namespace. You use this test pod to perform requests against the service in the tenant namespace.  
 `kubectl apply -f ./testing/test-pod.yaml -n test`
 
+- Verify that the pods are hosted on nodes in the main node-pool (not in the tenant node-pool)  
+`kubectl -n test get pods -o wide`
+
 - wait for the pod to be ready  
 `kubectl wait --for=condition=Ready pod -l app=test -n test`
 
 - The test namespace is not enabled for Istio injection. Verify the pod does not have an istio-proxy container  
 `kubectl -n test get pods -l app=test -o jsonpath='{.items..spec.containers[*].name}'`
-
-- Verify that the pods are hosted on nodes in the main node-pool (not in the tenant node-pool)  
-`kubectl -n test get pods -o wide`
 
 #### Test the interation
 - From the test pod in the test namespace, call the service in the tenant namespace  
@@ -245,7 +245,8 @@ Cloud Storage permissions
     --filter "bindings.members:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com"
   ```
 
-- Grant the Viewer IAM role to the Service Account used by apps in the tenant namespace  
+- Grant the Viewer IAM role to the Service Account used by apps in the tenant namespace. Note this grants View permissions to
+all resources in the project. The role is removed in a subsequent step.  
   ```
   gcloud projects add-iam-policy-binding $PROJECT \
     --member=serviceAccount:$CLUSTER-$TENANT-apps-sa@$PROJECT.iam.gserviceaccount.com \

@@ -1,13 +1,16 @@
 module "gke" {
   # The beta-private-cluster enables beta cluster features and opinionated defaults.
   # See the module docs https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/tree/master/modules/beta-private-cluster
-  # The following configuration creates:
+  # 
+  # The following configuration creates a cluster that implements many of the recommendations in the GKE hardening guide
+  # https://cloud.google.com/kubernetes-engine/docs/how-to/hardening-your-cluster:
   #  - private GKE cluster with authorized networks
   #  - at least 2 node pools (one default pool, plus one per tenant)
   #  - workload identity
   #  - shielded nodes  
   #  - GKE sandbox (gVisor) for the tenant nodes
   #  - Dataplane V2 (which automatically enables network policy)
+  #  - secrets encryption
   source            = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
   
   project_id        = var.project_id
@@ -25,6 +28,12 @@ module "gke" {
   enable_binary_authorization = true
   grant_registry_access = true
   
+  # Encrypt cluster secrets at the application layer
+  database_encryption = [{
+      "key_name": module.kms.keys[var.cluster_secrets_keyname],
+      "state": "ENCRYPTED"
+  }]
+
   # Dataplane V2
   datapath_provider = "ADVANCED_DATAPATH"
   # automatically enabled with Dataplane V2

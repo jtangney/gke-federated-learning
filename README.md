@@ -58,6 +58,7 @@ The infrastructure created by the blueprint includes:
   - Use shielded nodes that use a hardened node image with the containerd runtime.
   - Harden isolation of tenant workloads using [GKE Sandbox](https://cloud.google.com/kubernetes-engine/docs/concepts/sandbox-pods).
   - Enable [Dataplane V2](https://cloud.google.com/kubernetes-engine/docs/concepts/dataplane-v2) for optimised Kubernetes networking.
+  - [Encrypt cluster secrets](https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets) at the application layer.
 - Two GKE [node-pools](https://cloud.google.com/kubernetes-engine/docs/concepts/node-pools). 
   - You create a dedicated node pool to exclusively host tenant apps and resources. The nodes have taints to ensure that only tenant workloads
   are scheduled onto the tenant nodes
