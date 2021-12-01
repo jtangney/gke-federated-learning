@@ -1,5 +1,5 @@
 module "gke" {
-  # The beta-private-cluster enables beta cluster features and opinionated defaults.
+  # The beta-private-cluster module enables beta GKE features and set opinionated defaults.
   # See the module docs https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/tree/master/modules/beta-private-cluster
   # 
   # The following configuration creates a cluster that implements many of the recommendations in the GKE hardening guide
@@ -49,18 +49,19 @@ module "gke" {
       display_name: "NAT IP",
       cidr_block : format("%s/32", google_compute_address.nat_ip.address)
     },
+    # NOTE: we add the local IP of the workstation that applies the Terraform to authorized networks 
     {
       display_name: "Local IP",
       cidr_block : "${chomp(data.http.installation_workstation_ip.body)}/32"
     }
   ]
-  // open ports for ASM
+  # open ports for ASM
   add_cluster_firewall_rules = true
-  // we don't want ingress into the cluster by default
+  # we don't want ingress into the cluster by default
   http_load_balancing = false
   
   node_pools = concat(
-    // default node pool
+    # default node pool
     [{
       name = "main-pool"
       image_type = "COS_CONTAINERD"
@@ -72,7 +73,7 @@ module "gke" {
       enable_secure_boot = true
     }],
     
-    // list of tenant nodepools
+    # list of tenant nodepools
     [for tenant_name, config in local.tenants: {
       name = config.tenant_nodepool_name
       image_type = "COS_CONTAINERD"

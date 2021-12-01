@@ -1,10 +1,9 @@
 # Blueprint: Preparing a GKE cluster for untrusted workloads
 
 This repository contains a blueprint that creates and secures Google Cloud infrastructure that is ready to host semi-trusted 
-workloads, such as [federated learning](https://en.wikipedia.org/wiki/Federated_learning) workloads. 
+workloads, such as [federated learning](https://en.wikipedia.org/wiki/Federated_learning) workloads. Specifically, the blueprint creates and configures a Google Kubernetes Engine (GKE) cluster and related infrastructure such that the cluster is ready to participate in *cross-silo federated learning*. 
 
-Specifically, the blueprint creates and configures a Google Kubernetes Engine (GKE) cluster and related infrastructure
-such that the cluster is ready to participate in *cross-silo federated learning*. Federated learning is a machine learning approach that allows a loose federation of participants (e.g. different organisations) to collaboratively improve a shared model, without sharing any sensitive data. In cross-silo federated learning, each participant uses its own data and compute resources, called a *silo*. 
+Federated learning is a machine learning approach that allows a loose federation of participants (e.g. a group of organisations) to collaboratively improve a shared model, without sharing any sensitive data. In cross-silo federated learning, each participant uses its own data and compute resources, called a *silo*. 
 Eash silo trains a shared model using only its local data and compute resources. Training results are shared with the *federation owner*, who updates the shared model and redistributes to the silos for further training rounds, and the process repeats. This way, silos can collaborate to improve the model without sharing data. 
 
 This blueprint suggests using a GKE cluster as the compute infrastructure for a silo. The cluster is designed to host containerised
@@ -80,7 +79,6 @@ The cluster includes:
 - [Config Sync](https://cloud.google.com/anthos-config-management/docs/config-sync-overview), which keeps cluster configuration in sync with config defined in a Git repository. 
   - The config defined by the blueprint includes namespaces, service accounts, network policies, Policy Controller policies and Istio resourcess that are applied to the cluster. 
   - See the [configsync](configsync) dir for the full set of resources applied to the cluster
-
 - [Policy Controller](https://cloud.google.com/anthos-config-management/docs/concepts/policy-controller) enforces policies ('constraints') for your clusters. These policies act as 'guardrails' and prevent any changes to your cluster that violate security, operational, or compliance controls. 
   - Example policies enforced by the blueprint include:
     - Selected constraints [similar to PodSecurityPolicy](https://cloud.google.com/anthos-config-management/docs/how-to/using-constraints-to-enforce-pod-security)
@@ -88,7 +86,6 @@ The cluster includes:
       - Prevent creation of external services (Ingress, NodePort/LoadBalancer services)
       - Allow pods to pull container images only from a named set of repos
   - See the resources in the [configsync/policycontroller](configsync/policycontroller) directory for details of the constraints applied by this blueprint. 
-
 - [Anthos Service Mesh](https://cloud.google.com/service-mesh/docs/overview)(ASM) is powered by Istio and enables managed, observable, and secure communication across your services. The blueprint includes service mesh configuration that is applied to the cluster using Config Sync. The following points describe how this blueprint configures the service mesh. 
   - The root istio namespace (istio-system) is configured with
     - PeerAuthentication resource to allow only STRICT mTLS communications between services in the mesh
@@ -100,6 +97,7 @@ The cluster includes:
   - The tenant namespace is configured for automatic sidecar proxy injection, see next section. 
   - Note that the mesh does not include an Ingress Gateway
   - See the [servicemesh](configsync/servicemesh) dir for the cluster-level mesh config
+
 
 The blueprint configures a dedicated namespace for tenant apps and resources:
   - The tenant namespace is part of the service mesh. Pods in the namespace receive sidecar proxy containers. The namespace-level mesh resources include:
