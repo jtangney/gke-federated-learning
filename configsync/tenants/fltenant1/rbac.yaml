@@ -24,4 +24,4 @@ roleRef:
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: User
-  name: jeremy.tangney@gmail.com # kpt-set: ${tenant-developer}
+  name: someuser@example.com # kpt-set: ${tenant-developer}

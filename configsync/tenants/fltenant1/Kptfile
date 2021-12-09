@@ -23,5 +23,5 @@ pipeline:
     - image: gcr.io/kpt-fn/apply-setters:v0.2
       configMap:
         gcp-service-account: flsilo-fedlearn-apps-sa@jtg-flsilo.iam.gserviceaccount.com
-        tenant-developer: jeremy.tangney@gmail.com
+        tenant-developer: someuser@example.com
         tenant-name: fedlearn
