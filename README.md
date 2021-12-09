@@ -1,7 +1,6 @@
-# Blueprint: Preparing a GKE cluster for untrusted workloads
+# Blueprint: Preparing a GKE cluster for apps distributed by a third party
 
-This repository contains a blueprint that creates and secures Google Cloud infrastructure that is ready to host semi-trusted
-workloads, such as [federated learning](https://en.wikipedia.org/wiki/Federated_learning) workloads. Specifically, the blueprint creates and configures a Google Kubernetes Engine (GKE) cluster and related infrastructure such that the cluster is ready to participate in *cross-silo federated learning*.
+This repository contains a blueprint that creates and secures Google Cloud infrastructure that is ready to host custom apps distributed by a third party. The blueprint uses [federated learning](https://en.wikipedia.org/wiki/Federated_learning) as an example use case for hosting custom third party apps inside your cluster. Specifically, the blueprint creates and configures a Google Kubernetes Engine (GKE) cluster and related infrastructure such that the cluster is ready to participate in *cross-silo federated learning*.
 
 Federated learning is a machine learning approach that allows a loose federation of participants (e.g. a group of organisations) to collaboratively improve a shared model, without sharing any sensitive data. In cross-silo federated learning, each participant uses its own data and compute resources, called a *silo*.
 Eash silo trains a shared model using only its local data and compute resources. Training results are shared with the *federation owner*, who updates the shared model and redistributes to the silos for further training rounds, and the process repeats. This way, silos can collaborate to improve the model without sharing data.
@@ -27,9 +26,8 @@ This blueprint is focussed on creating and configuring GKE clusters. The followi
 ## Getting started
 To deploy this blueprint you need:
 - A Google Cloud project with billing enabled
-- Owner permissions on the project (TODO: tighten this up)
-- It is expected that you deploy the blueprint using Cloud Shell. If you want to execute locally you'll need Terraform, gcloud and kubectl
-  - NOTE that installation on Mac does not work well due to problems with ASM installation scripts. Use Cloud Shell.
+- Owner permissions on the project
+- It is expected that you deploy the blueprint using Cloud Shell.
 - You create the infastructure using Terraform. The blueprint uses a local [backend](https://www.terraform.io/docs/language/settings/backends/configuration.html). It is recommended to configure a remote backend for anything other than experimentation
 
 ## Understanding the repository structure
@@ -77,7 +75,7 @@ The following diagram describes the apps and resources within the GKE cluster
 
 The cluster includes:
 - [Config Sync](https://cloud.google.com/anthos-config-management/docs/config-sync-overview), which keeps cluster configuration in sync with config defined in a Git repository.
-  - The config defined by the blueprint includes namespaces, service accounts, network policies, Policy Controller policies and Istio resourcess that are applied to the cluster.
+  - The config defined by the blueprint includes namespaces, service accounts, network policies, Policy Controller policies and Istio resources that are applied to the cluster.
   - See the [configsync](configsync) dir for the full set of resources applied to the cluster
 - [Policy Controller](https://cloud.google.com/anthos-config-management/docs/concepts/policy-controller) enforces policies ('constraints') for your clusters. These policies act as 'guardrails' and prevent any changes to your cluster that violate security, operational, or compliance controls.
   - Example policies enforced by the blueprint include:
