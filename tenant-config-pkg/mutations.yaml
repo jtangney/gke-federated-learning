@@ -26,12 +26,12 @@ spec:
     kinds: ["Pod"]
     versions: ["v1"]
   match:
-    namespaces: 
+    namespaces:
     - "ns"  # kpt-set: ${tenant-name}
   location: "spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms"
   parameters:
     assign:
-      value: 
+      value:
         - matchExpressions:
           - key: "tenant"
             operator: In
@@ -50,12 +50,12 @@ spec:
     kinds: ["Pod"]
     versions: ["v1"]
   match:
-    namespaces: 
+    namespaces:
     - "ns"  # kpt-set: ${tenant-name}
   location: "spec.tolerations"
   parameters:
     assign:
-      value: 
+      value:
       - key: "tenant"
         operator: "Equal"
         value: "ns"  # kpt-set: ${tenant-name}

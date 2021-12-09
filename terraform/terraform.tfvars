@@ -1,12 +1,12 @@
 # GKE cluster name
 cluster_name="fedlearn"
 
-# Cluster tenant names. Each tenant gets a dedicated nodepool, service accounts etc. 
+# Cluster tenant names. Each tenant gets a dedicated nodepool, service accounts etc.
 tenant_names=["fltenant1"]
 
 # GKE cluster created created in this region
 region="europe-west1"
-# need to be from region above. Cluster nodes created in each zone. 
+# need to be from region above. Cluster nodes created in each zone.
 zones=["europe-west1-b"]
 
 # ASM version; will install the latest patch of this version

@@ -16,7 +16,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: ns # kpt-set: ${tenant-name}
-  labels: 
+  labels:
     tenant-ns: "true"
     # version must match the ASM control plane revision
     istio.io/rev: asm-110 # kpt-set: ${istio-revision}

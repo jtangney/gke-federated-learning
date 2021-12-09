@@ -1,18 +1,18 @@
 module "gke" {
   # The beta-private-cluster module enables beta GKE features and set opinionated defaults.
   # See the module docs https://github.com/terraform-google-modules/terraform-google-kubernetes-engine/tree/master/modules/beta-private-cluster
-  # 
+  #
   # The following configuration creates a cluster that implements many of the recommendations in the GKE hardening guide
   # https://cloud.google.com/kubernetes-engine/docs/how-to/hardening-your-cluster:
   #  - private GKE cluster with authorized networks
   #  - at least 2 node pools (one default pool, plus one per tenant)
   #  - workload identity
-  #  - shielded nodes  
+  #  - shielded nodes
   #  - GKE sandbox (gVisor) for the tenant nodes
   #  - Dataplane V2 (which automatically enables network policy)
   #  - secrets encryption
   source            = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
-  
+
   project_id        = var.project_id
   name              = var.cluster_name
   release_channel   = "REGULAR"
@@ -23,11 +23,11 @@ module "gke" {
   subnetwork        = google_compute_subnetwork.subnet.name
   ip_range_pods     = "pods"
   ip_range_services = "services"
-  
+
   enable_shielded_nodes = true
   enable_binary_authorization = true
   grant_registry_access = true
-  
+
   # Encrypt cluster secrets at the application layer
   database_encryption = [{
       "key_name": module.kms.keys[var.cluster_secrets_keyname],
@@ -38,7 +38,7 @@ module "gke" {
   datapath_provider = "ADVANCED_DATAPATH"
   # automatically enabled with Dataplane V2
   network_policy = false
-  
+
   // Private cluster nodes, public endpoint with authorized networks
   enable_private_nodes = true
   enable_private_endpoint  = false
@@ -49,7 +49,7 @@ module "gke" {
       display_name: "NAT IP",
       cidr_block : format("%s/32", google_compute_address.nat_ip.address)
     },
-    # NOTE: we add the local IP of the workstation that applies the Terraform to authorized networks 
+    # NOTE: we add the local IP of the workstation that applies the Terraform to authorized networks
     {
       display_name: "Local IP",
       cidr_block : "${chomp(data.http.installation_workstation_ip.body)}/32"
@@ -59,7 +59,7 @@ module "gke" {
   add_cluster_firewall_rules = true
   # we don't want ingress into the cluster by default
   http_load_balancing = false
-  
+
   node_pools = concat(
     # default node pool
     [{
@@ -67,19 +67,19 @@ module "gke" {
       image_type = "COS_CONTAINERD"
       machine_type = var.cluster_machine_type
       min_count = 3
-      max_count = 5      
+      max_count = 5
       auto_upgrade = true
       enable_integrity_monitoring = true
       enable_secure_boot = true
     }],
-    
+
     # list of tenant nodepools
     [for tenant_name, config in local.tenants: {
       name = config.tenant_nodepool_name
       image_type = "COS_CONTAINERD"
       machine_type = var.cluster_machine_type
       min_count  = 2
-      max_count = 5      
+      max_count = 5
       auto_upgrade = true
       enable_integrity_monitoring = true
       enable_secure_boot = true

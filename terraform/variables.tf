@@ -82,6 +82,6 @@ locals {
       tenant_nodepool_sa_name = format("%s-%s-nodes-sa", var.cluster_name, name)
       tenant_apps_sa_name     = format("%s-%s-apps-sa", var.cluster_name, name)
     }
-  }    
+  }
   gke_robot_sa  = "service-${data.google_project.project.number}@container-engine-robot.iam.gserviceaccount.com"
 }

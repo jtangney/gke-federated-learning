@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Adds selected PodSecurityPolicy constraints 
+# Adds selected PodSecurityPolicy constraints
 # https://cloud.google.com/anthos-config-management/docs/how-to/using-constraints-to-enforce-pod-security
 
 ---

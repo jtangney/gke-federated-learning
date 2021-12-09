@@ -6,7 +6,7 @@ module "kms" {
   location           = var.region
   keyring            = "keyring-${random_id.keyring_suffix.hex}"
   keys               = [var.cluster_secrets_keyname]
-  
+
   # IAM
   set_encrypters_for = [var.cluster_secrets_keyname]
   set_decrypters_for = [var.cluster_secrets_keyname]
