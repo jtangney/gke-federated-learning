@@ -73,15 +73,3 @@ variable "asm_version" {
 variable "asm_revision_label" {
   description = "ASM revision label"
 }
-
-locals {
-  # for each tenant, define the names of the nodepool, service accounts etc
-  tenants = {
-    for name in var.tenant_names: name => {
-      tenant_nodepool_name    = format("%s-pool", name)
-      tenant_nodepool_sa_name = format("%s-%s-nodes-sa", var.cluster_name, name)
-      tenant_apps_sa_name     = format("%s-%s-apps-sa", var.cluster_name, name)
-    }
-  }
-  gke_robot_sa  = "service-${data.google_project.project.number}@container-engine-robot.iam.gserviceaccount.com"
-}
